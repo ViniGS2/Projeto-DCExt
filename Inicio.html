@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="Estilos.css">
+
+</head>
+<body>
+    
+    <div id="CabecalhoInic">
+        
+        <div>
+            <h1>Sigh Card</h1>
+
+            <img src="imagens/construirCartao.png">
+
+            <p>"Crie os seus flash cards"</p>
+        </div>
+        
+        <div>
+        <button type="button" class="butao-asl" onclick="abrirCriar()"><img src="imagens/cartao.png" alt="cartões"></button>
+        <p>"Criar cartão"</p>
+        </div>
+        
+    </div>
+
+   <!-- janela de criação--> 
+
+    <div class="janela-criar" id="janela-criar">
+        <div class="conteudo">
+            <button class="fechar" id="fechar">X</button>
+            <h1>Imagem ESL</h1>
+            <p>"Criar deck"</p>
+            <form>
+                <input type="text" name="nome-deck">
+                <br>
+                <button type="button" value="confirmar-nome">Imagem ESL: criar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    
+</body>
+</html>
