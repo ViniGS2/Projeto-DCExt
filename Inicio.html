@@ -15,15 +15,11 @@
         <div>
             <h1>Sigh Card</h1>
 
-            <img src="imagens/construirCartao.png">
-
             <p>"Crie os seus flash cards"</p>
+            <br>
         </div>
         
-        <div>
-        <button type="button" class="butao-asl" onclick="abrirCriar()"><img src="imagens/cartao.png" alt="cartões"></button>
-        <p>"Criar cartão"</p>
-        </div>
+        <button type="button" id="botao-criar" onclick="abrirCriar()">+ Criar Deck</button>
         
     </div>
 
@@ -32,17 +28,30 @@
     <div class="janela-criar" id="janela-criar">
         <div class="conteudo">
             <button class="fechar" id="fechar">X</button>
-            <h1>Imagem ESL</h1>
-            <p>"Criar deck"</p>
+            <h1>Crie o seu deck</h1>
             <form>
+                Dê um nome!
+                <br>
                 <input type="text" name="nome-deck">
                 <br>
-                <button type="button" value="confirmar-nome">Imagem ESL: criar</button>
+                <button type="button" class="botao-criar" value="confirmar-nome">confirmar</button>
             </form>
         </div>
     </div>
 
     <script src="script.js"></script>
+
+    <!-- Deck na página --> 
+
+    <div class="Deck" id="Deck">
+        <h2>"DeckName"</h2>
+
+        <p>X cards</p>
+
+        <button class="botao-estudar" id="botao-estudar"> Estudar </button>
+        <button class="botao-editar" id="botao-editar">✒️</button>
+        <button class="botao-deletar" id="botao-deletar">🗑️</button>
+    </div>
     
 </body>
 </html>
