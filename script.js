@@ -10,7 +10,7 @@ function abrirCriar(){
     })
 }
 
- 
+
 document.getElementById('confirmar').addEventListener('click', () => { //cria o deck quando clica em confirmar
     const nomeInput = document.querySelector('input[name="nome-deck"]'); //bota o nome em "nomeInput"
     const nomeDeck = nomeInput.value.trim();//nome do deck vai receber o nome, esse .tri() é pra remover os espaços
@@ -20,6 +20,20 @@ document.getElementById('confirmar').addEventListener('click', () => { //cria o 
         return;
     }
 
+
+    // Pega o container que guarda todos os decks
+    const container = document.getElementById('container-decks');
+
+    // Event delegation: qualquer clique dentro do container
+    container.addEventListener('click', (e) => {
+        // Se clicou no botão de deletar
+        if (e.target.classList.contains('botao-deletar')) {
+            const deck = e.target.closest('.Deck'); // pega o deck pai
+            if (deck) {
+                deck.remove();
+            }
+        }
+});
     const novoDeck = document.createElement('div'); // cria um container pincipal onde vão estar nossos decks
     novoDeck.classList.add('Deck'); //adiciona um "Deck" que puxa as infos la do css
 
@@ -32,8 +46,8 @@ document.getElementById('confirmar').addEventListener('click', () => { //cria o 
         <button class="botao-deletar">🗑️</button>
     `;
 
+    
     //adicionar o novo deck ao container, como o container já está no body, já funciona!!!!
-    const container = document.getElementById('container-decks');
     container.appendChild(novoDeck);
 
     //Deveria limpar o unput se fechar o criar -- não tá indo zzzz
