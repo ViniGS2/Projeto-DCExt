@@ -1,0 +1,146 @@
+
+
+#CabecalhoInic{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+body{
+    background-color: gold;
+    margin-left: 10%;
+    margin-right: 10%;
+}
+
+
+.janela-criar{
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #00000080;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.conteudo{
+    position: relative;
+    width: 40%;
+    min-width: 100px;
+    min-height: 100px;
+    background-color: gold;
+    padding: 50px;
+    border-radius: 20px;
+}
+
+.fechar{
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: #00000080;
+    background-color: red;
+    cursor: pointer;
+}
+
+.janela-criar.abrir{
+    display: flex;
+}
+
+#botao-criar {
+    border-radius: 10%;
+    width: 200px;
+    height: 50px;
+    border: #00000080;
+    background-color: orangered;
+    cursor: pointer;
+}
+
+.pag-criar-elems {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#botao-criar:hover{
+    transform: scale(1.1);
+}
+
+.Deck{
+    width: 250px;
+    height: 100px;
+    background-color: orange;
+    border-radius: 30%;
+    padding: 50px;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.botao-estudar{
+    border-radius: 10%;
+    width: 70%;
+    height: 30%;
+    background-color: orangered;
+    border: #00000080;
+}
+
+.Deck p{
+    border-radius: 20%;
+    background-color: rgba(213, 139, 0, 0.915);
+    width: 25%;
+}
+
+.botao-editar {
+    border-radius: 10%;
+    background-color: orangered;
+    border: #00000080;
+    height: 27%;
+}
+
+.botao-deletar {
+    border-radius: 10%;
+    background-color: orangered;
+    border: #00000080;
+    height: 27%;
+}
+
+.Deck button{
+    cursor: pointer;
+}
+
+.Deck button:hover{
+    transform: scale(1.1);
+}
+
+#container-decks {
+    display: flex;           /* em linhas*/
+    flex-wrap: wrap;         /* quebra linha*/ 
+    gap: 64px;               
+    margin-top: 20px;        
+}
+
+.conteudo input{
+    border-radius: 10px;
+    border: 10px solid transparent;
+    width: 60%;
+    height: 30px;
+    background-color: rgba(213, 139, 0, 0.915);
+}
+
+.conteudo .botao-confirmar{
+    border-radius: 10%;
+    width: 15%;
+    height: 36px;
+    background-color: orangered;
+    border: transparent;
+    cursor: pointer;
+}
+
+#confirmar:hover{
+    transform: scale(1.1);
+}

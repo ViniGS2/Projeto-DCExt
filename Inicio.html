@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="Estilos.css">
+
+</head>
+<body>
+    
+    <div id="CabecalhoInic">
+        
+        <div>
+            <h1>Sign Card</h1>
+
+            <p>"Crie os seus flash cards"</p>
+            <br>
+        </div>
+        
+        <button type="button" id="botao-criar" onclick="abrirCriar()">+ Criar Deck</button>
+        
+    </div>
+
+   <!-- janela de criação--> 
+
+    <div class="janela-criar" id="janela-criar">
+        <div class="conteudo">
+            <button class="fechar" id="fechar">X</button>
+            <h1>Crie o seu sdeck</h1>
+            <form>
+                Dê um nome!
+                <br>
+                <br>
+                <input type="text" name="nome-deck">
+                <br>
+                <br>
+                <button type="button" class="botao-confirmar" id="confirmar">confirmar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+    
+    <!-- is Decks estão nesse container -->
+    <div id="container-decks">
+    <!-- Deck fixo -->
+        <!--<div class="Deck" id="deck-fixo">
+            <h2>"DeckName"</h2>
+            <p>X cards</p>
+            <button class="botao-estudar">Estudar</button>
+            <button class="botao-editar">✒️</button>
+            <button class="botao-deletar">🗑️</button>
+        </div>-->
+    </div>
+    
+</body>
+</html>
