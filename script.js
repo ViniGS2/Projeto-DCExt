@@ -15,7 +15,7 @@ document.getElementById('confirmar').addEventListener('click', () => { //cria o 
     const nomeInput = document.querySelector('input[name="nome-deck"]'); //bota o nome em "nomeInput"
     const nomeDeck = nomeInput.value.trim();//nome do deck vai receber o nome, esse .tri() é pra remover os espaços
 
-    if (nomeDeck == "") { //se tiver vazio ele manda esse alert
+    if (nomeDeck === "") { //se tiver vazio ele manda esse alert
         alert("Digite um nome para o deck!");
         return;
     }
@@ -34,7 +34,7 @@ document.getElementById('confirmar').addEventListener('click', () => { //cria o 
             }
         }
 });
-    const novoDeck = document.createElement('div'); // criando novoDeck 
+    const novoDeck = document.createElement('div'); // cria um container pincipal onde vão estar nossos decks
     novoDeck.classList.add('Deck'); //adiciona um "Deck" que puxa as infos la do css
 
     //Adicionar o conteúdo HTML do deck e bota o nome do imput Ô
