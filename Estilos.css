@@ -30,7 +30,7 @@ body{
     position: relative;
     width: 40%;
     min-width: 100px;
-    min-height: 300px;
+    min-height: 100px;
     background-color: gold;
     padding: 50px;
     border-radius: 20px;
@@ -124,3 +124,23 @@ body{
     margin-top: 20px;        
 }
 
+.conteudo input{
+    border-radius: 10px;
+    border: 10px solid transparent;
+    width: 60%;
+    height: 30px;
+    background-color: rgba(213, 139, 0, 0.915);
+}
+
+.conteudo .botao-confirmar{
+    border-radius: 10%;
+    width: 15%;
+    height: 36px;
+    background-color: orangered;
+    border: solid transparent;
+    cursor: pointer;
+}
+
+#confirmar:hover{
+    transform: scale(1.1);
+}
