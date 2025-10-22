@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Variáveis globais
+    // ===== NOVO: Variável Global "Fonte da Verdade" =====
+    let decks = []; // Este array guardará TODOS os dados
+    
+    // Variáveis globais (como antes)
     let deckAtual = null; // Guarda o ELEMENTO HTML do deck sendo editado
     let deckSendoEstudado = null; // Guarda o ARRAY de flashcards para estudo
-    let cardAtualIndex = 0; // Guarda o índice do card atual
+    let cardAtualIndex = 0; 
 
     // Elementos principais
     const container = document.getElementById('container-decks');
@@ -10,10 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Elementos da Janela Criar Deck
     const janelaCriar = document.getElementById('janela-criar');
     const btnConfirmar = document.getElementById('confirmar');
+    const nomeInput = document.querySelector('input[name="nome-deck"]');
 
     // Elementos da Janela Criar/Editar Flashcard
     const janelaEditar = document.getElementById('janela-criar-flashcard');
     const btnConfirmarEditar = document.getElementById('confirmarEditar');
+    const frenteInput = document.getElementById('frente-flashcard-img');
+    const versoInput = document.getElementById('verso-flashcard-img');
     
     // Elementos da Janela Estudar
     const janelaEstudar = document.getElementById('janela-estudar');
@@ -21,21 +27,61 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnProximo = document.getElementById('card-proximo');
     const btnAnterior = document.getElementById('card-anterior');
 
-    // --- FUNÇÕES ---
+    
+    // --- FUNÇÕES DE DADOS (LocalStorage) ---
 
-    // 1. Abrir janela de criar deck
+    // ===== NOVO: Salva o array 'decks' no localStorage =====
+    function salvarDecks() {
+        localStorage.setItem('signCardDecks', JSON.stringify(decks));
+    }
+
+    // ===== NOVO: Desenha os decks do array 'decks' no HTML =====
+    function renderizarTodosDecks() {
+        container.innerHTML = ''; // Limpa o container
+
+        decks.forEach(deckData => {
+            // Cria o elemento do deck
+            const novoDeck = document.createElement('div');
+            novoDeck.classList.add('Deck');
+            
+            // ===== NOVO: Adiciona um 'data-id' para sabermos qual deck é =====
+            novoDeck.dataset.id = deckData.id;
+
+            // Usa o HTML com o layout corrigido (que fizemos antes)
+            novoDeck.innerHTML = `
+                <h2>${deckData.name}</h2>
+                <p>${deckData.flashcards.length} card${deckData.flashcards.length !== 1 ? 's' : ''}</p>
+                <button class="botao-estudar">Estudar</button>
+                <button class="botao-editar">✒️</button> 
+                <button class="botao-deletar">🗑️</button>
+                </div>
+            `;
+            container.appendChild(novoDeck);
+        });
+    }
+
+    // ===== NOVO: Carrega os decks do localStorage ao iniciar =====
+    function carregarDecks() {
+        const decksSalvos = localStorage.getItem('signCardDecks');
+        if (decksSalvos) {
+            decks = JSON.parse(decksSalvos);
+            renderizarTodosDecks();
+        }
+    }
+
+
+    // --- FUNÇÕES DE JANELA (Como antes, com pequenas mudanças) ---
+
     function abrirCriar(){
         janelaCriar.classList.add('abrir');
     }
-    // Expõe a função para o HTML (onclick="abrirCriar()")
     window.abrirCriar = abrirCriar;
 
-    // 2. Abrir janela de editar flashcard
     function AbrirEditar(){
         janelaEditar.classList.add('abrir');
     }
 
-    // 3. Função para ler arquivo de imagem como URL
+    // Esta função agora é usada para *salvar* (converter para DataURL)
     function lerArquivoComoURL(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -45,8 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. Função para mostrar o card atual na janela de estudo
-    async function mostrarCard(index) {
+    // ===== MODIFICADO: Não precisa mais ser 'async' =====
+    // A função agora recebe DataURLs de texto, não arquivos
+    function mostrarCard(index) {
         if (!deckSendoEstudado || !deckSendoEstudado[index]) return;
 
         const card = deckSendoEstudado[index];
@@ -58,35 +105,27 @@ document.addEventListener('DOMContentLoaded', () => {
         frenteEl.innerHTML = '';
         versoEl.innerHTML = '';
 
+        // ===== SIMPLIFICADO: Apenas joga a string DataURL no 'src' =====
         try {
-            // Lê os arquivos de imagem e os exibe
-            const frenteURL = await lerArquivoComoURL(card.frente);
-            const versoURL = await lerArquivoComoURL(card.verso);
-
-            frenteEl.innerHTML = `<img src="${frenteURL}" alt="Frente">`;
-            versoEl.innerHTML = `<img src="${versoURL}" alt="Verso">`;
-
+            frenteEl.innerHTML = `<img src="${card.frente}" alt="Frente">`;
+            versoEl.innerHTML = `<img src="${card.verso}" alt="Verso">`;
         } catch (error) {
-            console.error("Erro ao ler imagem do flashcard:", error);
+            console.error("Erro ao mostrar imagem do flashcard:", error);
             frenteEl.innerHTML = 'Erro ao carregar imagem';
         }
 
-        // Atualiza o contador
         contadorEl.textContent = `${index + 1} / ${deckSendoEstudado.length}`;
-
-        // Garante que o card comece virado para frente
         flashcardEstudo.classList.remove('is-flipped');
     }
 
-    // 5. Abrir a janela de estudo
-    function abrirJanelaEstudar(deck) {
-        // Verifica se o deck tem a propriedade .flashcards e se ela não está vazia
-        if (!deck.flashcards || deck.flashcards.length === 0) {
+    // ===== MODIFICADO: 'deck' agora é o objeto de DADOS, não o HTML =====
+    function abrirJanelaEstudar(deckData) {
+        if (!deckData.flashcards || deckData.flashcards.length === 0) {
             alert("Este deck está vazio! Adicione cards no botão ✒️.");
             return;
         }
 
-        deckSendoEstudado = deck.flashcards; // Define o deck que vamos estudar
+        deckSendoEstudado = deckData.flashcards; // Define o deck que vamos estudar
         cardAtualIndex = 0; // Começa do primeiro card
 
         janelaEstudar.classList.add('abrir');
@@ -96,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- LISTENERS (Ouvintes de Eventos) ---
 
-    // 1. Listener para fechar a Janela CRIAR DECK
+    // 1. Listeners para fechar Janelas (Sem mudanças)
     if (janelaCriar) {
         janelaCriar.addEventListener('click', (e) => {
             if (e.target.id == 'fechar-criar' || e.target.id == 'janela-criar') {
@@ -104,8 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
-    // 2. Listener para fechar a Janela EDITAR FLASHCARD
     if (janelaEditar) {
         janelaEditar.addEventListener('click', (e) => {
             if (e.target.id == 'fechar-flashcard' || e.target.id == 'janela-criar-flashcard') {
@@ -113,25 +150,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
-    // 3. Listener para fechar a Janela ESTUDAR
     if (janelaEstudar) {
         janelaEstudar.addEventListener('click', (e) => {
             if (e.target.id == 'fechar-estudar' || e.target.id == 'janela-estudar') {
                 janelaEstudar.classList.remove('abrir');
-                deckSendoEstudado = null; // Limpa o deck em estudo
+                deckSendoEstudado = null; 
             }
         });
     }
 
-    // 4. Listener para VIRAR o card de estudo
+    // 2. Listeners de Navegação/Estudo (Sem mudanças)
     if (flashcardEstudo) {
         flashcardEstudo.addEventListener('click', () => {
             flashcardEstudo.classList.toggle('is-flipped');
         });
     }
-
-    // 5. Listeners para NAVEGAÇÃO (Próximo / Anterior)
     if (btnProximo) {
         btnProximo.addEventListener('click', () => {
             if (deckSendoEstudado && cardAtualIndex < deckSendoEstudado.length - 1) {
@@ -140,7 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
     if (btnAnterior) {
         btnAnterior.addEventListener('click', () => {
             if (deckSendoEstudado && cardAtualIndex > 0) {
@@ -150,12 +182,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 6. Listener para CONFIRMAR a criação de um novo FLASHCARD
-    if (btnConfirmarEditar) {
-        btnConfirmarEditar.addEventListener('click', () => {
-            const frenteInput = document.getElementById('frente-flashcard-img');
-            const versoInput = document.getElementById('verso-flashcard-img');
 
+    // 3. ===== MODIFICADO: Listener para Adicionar FLASHCARD =====
+    // Esta função agora precisa ser 'async' para converter as imagens
+    if (btnConfirmarEditar) {
+        btnConfirmarEditar.addEventListener('click', async () => { // <== TORNAR ASYNC
+            
             const frenteImagem = frenteInput?.files[0];
             const versoImagem = versoInput?.files[0];
 
@@ -164,89 +196,114 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            if (deckAtual) {
-                // 'deckAtual' é o ELEMENTO HTML do deck
-                // Vamos anexar os dados dos flashcards diretamente a ele
-                if (!deckAtual.flashcards) deckAtual.flashcards = [];
-                
-                deckAtual.flashcards.push({
-                    frente: frenteImagem,
-                    verso: versoImagem
-                });
+            if (deckAtual) { // 'deckAtual' é o elemento HTML
+                try {
+                    // ===== NOVO: Converte os arquivos para DataURL (texto) =====
+                    const [frenteURL, versoURL] = await Promise.all([
+                        lerArquivoComoURL(frenteImagem),
+                        lerArquivoComoURL(versoImagem)
+                    ]);
 
-                // --- obtém o elemento <p> contador do deckAtual ---
-                const contador = deckAtual.querySelector('p');
-                const count = deckAtual.flashcards.length;
-                contador.textContent = `${count} card${count > 1 ? 's' : ''}`;
+                    // ===== NOVO: Encontra o deck no nosso array 'decks' =====
+                    const deckId = Number(deckAtual.dataset.id);
+                    const deckNoDb = decks.find(d => d.id === deckId);
+
+                    if (deckNoDb) {
+                        // Adiciona as strings de imagem ao array
+                        deckNoDb.flashcards.push({
+                            frente: frenteURL,
+                            verso: versoURL
+                        });
+                        
+                        salvarDecks(); // Salva no localStorage
+
+                        // Atualiza o contador no HTML
+                        const contador = deckAtual.querySelector('p');
+                        const count = deckNoDb.flashcards.length;
+                        contador.textContent = `${count} card${count > 1 ? 's' : ''}`;
+                    }
+                    
+                    // limpa inputs e fecha
+                    frenteInput.value = "";
+                    versoInput.value = "";
+                    janelaEditar.classList.remove('abrir');
+
+                } catch (err) {
+                    alert("Erro ao converter imagens.");
+                    console.error(err);
+                }
             } else {
                 alert("Nenhum deck selecionado para editar.");
             }
-
-            // limpa inputs e fecha
-            if (frenteInput) frenteInput.value = "";
-            if (versoInput) versoInput.value = "";
-            janelaEditar.classList.remove('abrir');
         });
     }
 
-    // 7. Listener para o CONTAINER de decks (Delegação de Eventos)
+    // 4. ===== MODIFICADO: Listener do CONTAINER (Deletar, Editar, Estudar) =====
     if (container) {
         container.addEventListener('click', (e) => {
-            const deck = e.target.closest('.Deck');
-            if (!deck) return; // Sai se o clique não foi em um deck
+            const deckElemento = e.target.closest('.Deck');
+            if (!deckElemento) return; 
+
+            // ===== NOVO: Pega o ID do deck a partir do data-id =====
+            const deckId = Number(deckElemento.dataset.id);
 
             // Ação: DELETAR
             if (e.target.classList.contains('botao-deletar')) {
-                if (confirm(`Tem certeza que quer deletar o deck "${deck.querySelector('h2').textContent}"?`)) {
-                    deck.remove();
+                if (confirm(`Tem certeza que quer deletar o deck "${deckElemento.querySelector('h2').textContent}"?`)) {
+                    
+                    // ===== NOVO: Remove do array 'decks' e re-renderiza =====
+                    decks = decks.filter(d => d.id !== deckId);
+                    salvarDecks();
+                    renderizarTodosDecks(); // O deck sumirá da tela
                 }
             }
 
             // Ação: EDITAR (Abrir janela de flashcards)
             if (e.target.classList.contains('botao-editar')) {
-                deckAtual = deck; // Define qual deck está sendo editado
+                // 'deckAtual' ainda é o elemento HTML, o que está correto.
+                deckAtual = deckElemento; 
                 AbrirEditar();
             }
 
             // Ação: ESTUDAR
             if (e.target.classList.contains('botao-estudar')) {
-                abrirJanelaEstudar(deck); // Chama a nova função
+                // ===== NOVO: Encontra o objeto de DADOS e passa para a função =====
+                const deckData = decks.find(d => d.id === deckId);
+                if (deckData) {
+                    abrirJanelaEstudar(deckData);
+                }
             }
         });
-    } else {
-        console.warn('Elemento #container-decks não encontrado no DOM.');
     }
 
-    // 8. Listener para CONFIRMAR a criação de um novo DECK
+    // 5. ===== MODIFICADO: Listener para Criar novo DECK =====
     if (btnConfirmar) {
         btnConfirmar.addEventListener('click', () => {
-            const nomeInput = document.querySelector('input[name="nome-deck"]');
             const nomeDeck = nomeInput ? nomeInput.value.trim() : '';
-
             if (nomeDeck == "") {
                 alert("Digite um nome para o deck!");
                 return;
             }
 
-            // Cria o elemento do deck
-            const novoDeck = document.createElement('div');
-            novoDeck.classList.add('Deck');
+            // ===== NOVO: Cria um objeto de DADOS, em vez de HTML =====
+            const novoDeckObj = {
+                id: Date.now(), // ID único baseado no tempo atual
+                name: nomeDeck,
+                flashcards: []
+            };
 
-            novoDeck.innerHTML = `
-                <h2>${nomeDeck}</h2>
-                <p>0 cards</p>
-                <button class="botao-estudar">Estudar</button>
-                <button class="botao-editar">✒️</button> 
-                <button class="botao-deletar">🗑️</button>
-            `;
-            
-            // Importante: Inicializa o array de flashcards no próprio elemento
-            novoDeck.flashcards = []; 
+            // ===== NOVO: Adiciona ao array 'decks' e salva/renderiza =====
+            decks.push(novoDeckObj);
+            salvarDecks();
+            renderizarTodosDecks(); // O novo deck aparecerá na tela
 
-            container.appendChild(novoDeck);
-
-            if (nomeInput) nomeInput.value = "";
+            nomeInput.value = "";
             janelaCriar.classList.remove('abrir');
         });
     }
+
+
+    // --- INICIALIZAÇÃO ---
+    // ===== NOVO: Carrega tudo do localStorage quando a página abre =====
+    carregarDecks();
 });
