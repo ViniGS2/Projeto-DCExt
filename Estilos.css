@@ -1,5 +1,3 @@
-
-
 #CabecalhoInic{
     display: flex;
     justify-content: space-between;
@@ -118,10 +116,10 @@ body{
 }
 
 #container-decks {
-    display: flex;           /* em linhas*/
-    flex-wrap: wrap;         /* quebra linha*/ 
-    gap: 64px;               
-    margin-top: 20px;        
+    display: flex;          /* em linhas*/
+    flex-wrap: wrap;        /* quebra linha*/ 
+    gap: 64px;              
+    margin-top: 20px;       
 }
 
 .conteudo input{
@@ -141,6 +139,156 @@ body{
     cursor: pointer;
 }
 
-#confirmar:hover{
+.conteudo .botao-texto{
+    border-radius: 10%;
+    width: 15%;
+    height: 36px;
+    background-color: rgb(249, 255, 135);
+    border: solid transparent;
+    cursor: pointer;
+}
+
+#bTexto:hover{
+    transform: scale(1.1);
+}
+
+.conteudo .botao-imagemGifs{
+    border-radius: 10%;
+    width: 20%;
+    height: 36px;
+    background-color: rgb(249, 255, 135);
+    border: solid transparent;
+    cursor: pointer;
+}
+
+#bImagemGifs:hover{
+    transform: scale(1.1);
+}
+
+
+.janela-criar-flashcard{
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #00000080;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    
+}
+
+.janela-criar-flashcard.abrir{
+    display : flex
+}
+
+/* --- Estilos da Janela de Estudo --- */
+
+.janela-estudar {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    
+    background-color: gold; /* Era #00000080 */
+    
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000; /* Mais alto que os outros */
+}
+
+.janela-estudar.abrir {
+    display: flex;
+}
+
+/* --- Estilos do Efeito de Virar (Flashcard) --- */
+
+.flashcard-container {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Define a perspectiva 3D */
+.flashcard {
+    background-color: transparent;
+    width: 400px; /* Largura do card */
+    height: 300px; /* Altura do card */
+    perspective: 1000px;
+    cursor: pointer;
+}
+
+/* O container que realmente vira */
+.flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d; /* Mantém o 3D */
+}
+
+/* Classe 'is-flipped' que será adicionada/removida pelo JS */
+.flashcard.is-flipped .flashcard-inner {
+    transform: rotateY(180deg);
+}
+
+/* Frente e Verso */
+.flashcard-front,
+.flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden; /* Safari */
+    backface-visibility: hidden; /* Esconde o lado de trás */
+    border-radius: 15px;
+    background-color: white;
+    border: 2px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Garante que a imagem não vaze */
+}
+
+/* O verso começa virado */
+.flashcard-back {
+    transform: rotateY(180deg);
+    background-color: #f0f0f0;
+}
+
+/* Estilo para as imagens dentro dos cards */
+.flashcard-front img,
+.flashcard-back img {
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: contain;
+}
+
+/* --- Estilos da Navegação --- */
+
+.navegacao-estudo {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.navegacao-estudo button {
+    border-radius: 10%;
+    width: 100px;
+    height: 36px;
+    background-color: orangered;
+    border: solid transparent;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+}
+
+.navegacao-estudo button:hover {
     transform: scale(1.1);
 }

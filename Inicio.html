@@ -3,58 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
+    <title>Sign Card</title>
     <link rel="stylesheet" href="Estilos.css">
-
 </head>
 <body>
     
     <div id="CabecalhoInic">
-        
         <div>
             <h1>Sign Card</h1>
-
             <p>"Crie os seus flash cards"</p>
             <br>
         </div>
-        
         <button type="button" id="botao-criar" onclick="abrirCriar()">+ Criar Deck</button>
-        
     </div>
-
-   <!-- janela de criação--> 
 
     <div class="janela-criar" id="janela-criar">
         <div class="conteudo">
-            <button class="fechar" id="fechar">X</button>
-            <h1>Crie o seu sdeck</h1>
+            <button class="fechar" id="fechar-criar">X</button>
+            <h1>Crie o seu Deck</h1>
             <form>
                 Dê um nome!
-                <br>
-                <br>
+                <br><br>
                 <input type="text" name="nome-deck">
-                <br>
-                <br>
+                <br><br>
                 <button type="button" class="botao-confirmar" id="confirmar">confirmar</button>
             </form>
         </div>
     </div>
 
-    <script src="script.js"></script>
-
-    
-    <!-- is Decks estão nesse container -->
-    <div id="container-decks">
-    <!-- Deck fixo -->
-        <!--<div class="Deck" id="deck-fixo">
-            <h2>"DeckName"</h2>
-            <p>X cards</p>
-            <button class="botao-estudar">Estudar</button>
-            <button class="botao-editar">✒️</button>
-            <button class="botao-deletar">🗑️</button>
-        </div>-->
+    <div class="janela-criar-flashcard" id="janela-criar-flashcard">
+        <div class="conteudo">
+            <button class="fechar" id="fechar-flashcard">X</button>
+            <h1>Edite o seu Deck</h1>
+            <form>
+                <br>
+                <button type="button" class="botao-imagemGifs" id="bImagemGifs">Imagens/Gifs</button>
+                <br><br>
+                Frente:
+                <br><br>
+                <input type="file" id="frente-flashcard-img" accept="image/*,image/gif">
+                <br><br>
+                Verso:
+                <br><br>
+                <input type="file" name="frente-imagem" id="verso-flashcard-img" accept="image/*,image/gif">
+                <br><br><br>
+                <button type="button" name="confirmarEditar" class="botao-confirmar" id="confirmarEditar">confirmar</button>
+            </form>
+        </div>
     </div>
     
+    <div class="janela-estudar" id="janela-estudar">
+        <div class="conteudo">
+            <button class="fechar" id="fechar-estudar">X</button>
+            <h1>Estudando</h1>
+
+            <div class="flashcard-container">
+                <div class="flashcard" id="flashcard-estudo">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front" id="flashcard-frente">
+                            </div>
+                        <div class="flashcard-back" id="flashcard-verso">
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navegacao-estudo">
+                <button id="card-anterior">Anterior</button>
+                <span id="contador-cards">0 / 0</span>
+                <button id="card-proximo">Próximo</button>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="container-decks">
+        </div>
+    
+    <script src="script.js"></script>
 </body>
 </html>
