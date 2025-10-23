@@ -1,11 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ===== NOVO: Variável Global "Fonte da Verdade" =====
+    // ===== Variável Global "Fonte da Verdade" =====
     let decks = []; // Este array guardará TODOS os dados
     
-    // Variáveis globais (como antes)
+    // Variáveis globais
     let deckAtual = null; // Guarda o ELEMENTO HTML do deck sendo editado
     let deckSendoEstudado = null; // Guarda o ARRAY de flashcards para estudo
     let cardAtualIndex = 0; 
+
+    // ===== NOVO: Variáveis para URLs temporárias (Blobs) =====
+    // Precisamos delas para o IndexedDB
+    let tempFrenteURL = null;
+    let tempVersoURL = null;
 
     // Elementos principais
     const container = document.getElementById('container-decks');
@@ -28,14 +33,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnAnterior = document.getElementById('card-anterior');
 
     
-    // --- FUNÇÕES DE DADOS (LocalStorage) ---
+    // --- FUNÇÕES DE DADOS (localForage / IndexedDB) ---
 
-    // ===== NOVO: Salva o array 'decks' no localStorage =====
-    function salvarDecks() {
-        localStorage.setItem('signCardDecks', JSON.stringify(decks));
+    // ===== MODIFICADO: Salva o array 'decks' no IndexedDB (assíncrono) =====
+    async function salvarDecks() {
+        try {
+            // Não precisa de JSON.stringify! localForage cuida disso.
+            await localforage.setItem('signCardDecks', decks);
+        } catch (err) {
+            console.error("Erro ao salvar no localForage:", err);
+        }
     }
 
-    // ===== NOVO: Desenha os decks do array 'decks' no HTML =====
+    // ===== SEM MUDANÇAS: Desenha os decks do array 'decks' no HTML =====
     function renderizarTodosDecks() {
         container.innerHTML = ''; // Limpa o container
 
@@ -44,10 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const novoDeck = document.createElement('div');
             novoDeck.classList.add('Deck');
             
-            // ===== NOVO: Adiciona um 'data-id' para sabermos qual deck é =====
+            // Adiciona um 'data-id'
             novoDeck.dataset.id = deckData.id;
 
-            // Usa o HTML com o layout corrigido (que fizemos antes)
+            // Usa o HTML com o layout corrigido
             novoDeck.innerHTML = `
                 <h2>${deckData.name}</h2>
                 <p>${deckData.flashcards.length} card${deckData.flashcards.length !== 1 ? 's' : ''}</p>
@@ -60,17 +70,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ===== NOVO: Carrega os decks do localStorage ao iniciar =====
-    function carregarDecks() {
-        const decksSalvos = localStorage.getItem('signCardDecks');
-        if (decksSalvos) {
-            decks = JSON.parse(decksSalvos);
-            renderizarTodosDecks();
+    // ===== MODIFICADO: Carrega os decks do IndexedDB ao iniciar (assíncrono) =====
+    async function carregarDecks() {
+        try {
+            // Não precisa de JSON.parse!
+            const decksSalvos = await localforage.getItem('signCardDecks');
+            if (decksSalvos) {
+                decks = decksSalvos;
+                renderizarTodosDecks();
+            }
+        } catch (err) {
+            console.error("Erro ao carregar do localForage:", err);
         }
     }
 
 
-    // --- FUNÇÕES DE JANELA (Como antes, com pequenas mudanças) ---
+    // --- FUNÇÕES DE JANELA ---
 
     function abrirCriar(){
         janelaCriar.classList.add('abrir');
@@ -81,18 +96,12 @@ document.addEventListener('DOMContentLoaded', () => {
         janelaEditar.classList.add('abrir');
     }
 
-    // Esta função agora é usada para *salvar* (converter para DataURL)
-    function lerArquivoComoURL(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-        });
-    }
+    // ===== REMOVIDO: A função lerArquivoComoURL() não é mais necessária =====
+    // Não vamos mais converter imagens para DataURL (texto).
 
-    // ===== MODIFICADO: Não precisa mais ser 'async' =====
-    // A função agora recebe DataURLs de texto, não arquivos
+
+    // ===== MODIFICADO: Usa URL.createObjectURL() para mostrar os Arquivos =====
+    // Os cards agora guardam o Objeto "File", não um texto de URL.
     function mostrarCard(index) {
         if (!deckSendoEstudado || !deckSendoEstudado[index]) return;
 
@@ -105,12 +114,21 @@ document.addEventListener('DOMContentLoaded', () => {
         frenteEl.innerHTML = '';
         versoEl.innerHTML = '';
 
-        // ===== SIMPLIFICADO: Apenas joga a string DataURL no 'src' =====
+        // ===== NOVO: Limpa as URLs temporárias antigas =====
+        // Isso é crucial para não vazar memória!
+        if (tempFrenteURL) URL.revokeObjectURL(tempFrenteURL);
+        if (tempVersoURL) URL.revokeObjectURL(tempVersoURL);
+
+        // ===== NOVO: Cria URLs temporárias (Blob) para os Arquivos =====
         try {
-            frenteEl.innerHTML = `<img src="${card.frente}" alt="Frente">`;
-            versoEl.innerHTML = `<img src="${card.verso}" alt="Verso">`;
+            // card.frente e card.verso são Objetos "File"
+            tempFrenteURL = URL.createObjectURL(card.frente);
+            tempVersoURL = URL.createObjectURL(card.verso);
+
+            frenteEl.innerHTML = `<img src="${tempFrenteURL}" alt="Frente">`;
+            versoEl.innerHTML = `<img src="${tempVersoURL}" alt="Verso">`;
         } catch (error) {
-            console.error("Erro ao mostrar imagem do flashcard:", error);
+            console.error("Erro ao criar URL do objeto:", error);
             frenteEl.innerHTML = 'Erro ao carregar imagem';
         }
 
@@ -118,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
         flashcardEstudo.classList.remove('is-flipped');
     }
 
-    // ===== MODIFICADO: 'deck' agora é o objeto de DADOS, não o HTML =====
+    // ===== SEM MUDANÇAS (Função em si) =====
     function abrirJanelaEstudar(deckData) {
         if (!deckData.flashcards || deckData.flashcards.length === 0) {
             alert("Este deck está vazio! Adicione cards no botão ✒️.");
@@ -135,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- LISTENERS (Ouvintes de Eventos) ---
 
-    // 1. Listeners para fechar Janelas (Sem mudanças)
+    // 1. Listeners para fechar Janelas
     if (janelaCriar) {
         janelaCriar.addEventListener('click', (e) => {
             if (e.target.id == 'fechar-criar' || e.target.id == 'janela-criar') {
@@ -150,11 +168,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    // ===== MODIFICADO: Listener de fechar 'Estudar' agora limpa as URLs =====
     if (janelaEstudar) {
         janelaEstudar.addEventListener('click', (e) => {
             if (e.target.id == 'fechar-estudar' || e.target.id == 'janela-estudar') {
                 janelaEstudar.classList.remove('abrir');
                 deckSendoEstudado = null; 
+                
+                // ===== NOVO: Limpa as URLs temporárias ao fechar a janela =====
+                if (tempFrenteURL) URL.revokeObjectURL(tempFrenteURL);
+                if (tempVersoURL) URL.revokeObjectURL(tempVersoURL);
+                tempFrenteURL = null;
+                tempVersoURL = null;
             }
         });
     }
@@ -183,11 +208,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // 3. ===== MODIFICADO: Listener para Adicionar FLASHCARD =====
-    // Esta função agora precisa ser 'async' para converter as imagens
+    // 3. ===== MODIFICADO: Listener para Adicionar FLASHCARD (Salva o Arquivo) =====
     if (btnConfirmarEditar) {
         btnConfirmarEditar.addEventListener('click', async () => { // <== TORNAR ASYNC
             
+            // Pegamos os OBJETOS "File"
             const frenteImagem = frenteInput?.files[0];
             const versoImagem = versoInput?.files[0];
 
@@ -198,24 +223,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (deckAtual) { // 'deckAtual' é o elemento HTML
                 try {
-                    // ===== NOVO: Converte os arquivos para DataURL (texto) =====
-                    const [frenteURL, versoURL] = await Promise.all([
-                        lerArquivoComoURL(frenteImagem),
-                        lerArquivoComoURL(versoImagem)
-                    ]);
-
-                    // ===== NOVO: Encontra o deck no nosso array 'decks' =====
+                    // ===== REMOVIDO: Não precisamos converter para DataURL =====
+                    
                     const deckId = Number(deckAtual.dataset.id);
                     const deckNoDb = decks.find(d => d.id === deckId);
 
                     if (deckNoDb) {
-                        // Adiciona as strings de imagem ao array
+                        // ===== NOVO: Adiciona os OBJETOS "File" diretamente =====
                         deckNoDb.flashcards.push({
-                            frente: frenteURL,
-                            verso: versoURL
+                            frente: frenteImagem,
+                            verso: versoImagem
                         });
                         
-                        salvarDecks(); // Salva no localStorage
+                        await salvarDecks(); // Salva no IndexedDB
 
                         // Atualiza o contador no HTML
                         const contador = deckAtual.querySelector('p');
@@ -229,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     janelaEditar.classList.remove('abrir');
 
                 } catch (err) {
-                    alert("Erro ao converter imagens.");
+                    alert("Erro ao salvar flashcard.");
                     console.error(err);
                 }
             } else {
@@ -238,36 +258,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. ===== MODIFICADO: Listener do CONTAINER (Deletar, Editar, Estudar) =====
+    // 4. ===== MODIFICADO: Listener do CONTAINER (Deletar precisa ser async) =====
     if (container) {
-        container.addEventListener('click', (e) => {
+        container.addEventListener('click', async (e) => { // <== TORNAR ASYNC
             const deckElemento = e.target.closest('.Deck');
             if (!deckElemento) return; 
 
-            // ===== NOVO: Pega o ID do deck a partir do data-id =====
             const deckId = Number(deckElemento.dataset.id);
 
             // Ação: DELETAR
             if (e.target.classList.contains('botao-deletar')) {
                 if (confirm(`Tem certeza que quer deletar o deck "${deckElemento.querySelector('h2').textContent}"?`)) {
                     
-                    // ===== NOVO: Remove do array 'decks' e re-renderiza =====
+                    // Remove do array 'decks'
                     decks = decks.filter(d => d.id !== deckId);
-                    salvarDecks();
+                    
+                    await salvarDecks(); // <== ADICIONAR AWAIT
                     renderizarTodosDecks(); // O deck sumirá da tela
                 }
             }
 
-            // Ação: EDITAR (Abrir janela de flashcards)
+            // Ação: EDITAR (Abrir janela de flashcards) - Sem mudança
             if (e.target.classList.contains('botao-editar')) {
-                // 'deckAtual' ainda é o elemento HTML, o que está correto.
                 deckAtual = deckElemento; 
                 AbrirEditar();
             }
 
-            // Ação: ESTUDAR
+            // Ação: ESTUDAR - Sem mudança
             if (e.target.classList.contains('botao-estudar')) {
-                // ===== NOVO: Encontra o objeto de DADOS e passa para a função =====
                 const deckData = decks.find(d => d.id === deckId);
                 if (deckData) {
                     abrirJanelaEstudar(deckData);
@@ -276,25 +294,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 5. ===== MODIFICADO: Listener para Criar novo DECK =====
+    // 5. ===== MODIFICADO: Listener para Criar novo DECK (precisa ser async) =====
     if (btnConfirmar) {
-        btnConfirmar.addEventListener('click', () => {
+        btnConfirmar.addEventListener('click', async () => { // <== TORNAR ASYNC
             const nomeDeck = nomeInput ? nomeInput.value.trim() : '';
             if (nomeDeck == "") {
                 alert("Digite um nome para o deck!");
                 return;
             }
 
-            // ===== NOVO: Cria um objeto de DADOS, em vez de HTML =====
+            // Cria um objeto de DADOS
             const novoDeckObj = {
-                id: Date.now(), // ID único baseado no tempo atual
+                id: Date.now(), // ID único
                 name: nomeDeck,
                 flashcards: []
             };
 
-            // ===== NOVO: Adiciona ao array 'decks' e salva/renderiza =====
+            // Adiciona ao array 'decks' e salva/renderiza
             decks.push(novoDeckObj);
-            salvarDecks();
+            await salvarDecks(); // <== ADICIONAR AWAIT
             renderizarTodosDecks(); // O novo deck aparecerá na tela
 
             nomeInput.value = "";
@@ -304,6 +322,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- INICIALIZAÇÃO ---
-    // ===== NOVO: Carrega tudo do localStorage quando a página abre =====
+    // ===== MODIFICADO: Carrega tudo do localForage (IndexedDB) =====
     carregarDecks();
 });
