@@ -1,5 +1,3 @@
-
-
 #CabecalhoInic{
     display: flex;
     justify-content: space-between;
@@ -7,9 +5,16 @@
 }
 
 body{
+    overflow-y: auto;
     background-color: gold;
     margin-left: 10%;
     margin-right: 10%;
+    overflow-x: hidden;
+
+}
+
+html, body{
+    height: 100%;
 }
 
 
@@ -118,9 +123,267 @@ body{
 }
 
 #container-decks {
-    display: flex;           /* em linhas*/
-    flex-wrap: wrap;         /* quebra linha*/ 
-    gap: 64px;               
-    margin-top: 20px;        
+    display: flex;          /* em linhas*/
+    flex-wrap: wrap;        /* quebra linha*/ 
+    gap: 64px;              
+    margin-top: 20px;       
 }
+
+.conteudo input{
+    border-radius: 10px;
+    border: 10px solid transparent;
+    width: 60%;
+    height: 30px;
+    background-color: rgba(213, 139, 0, 0.915);
+}
+
+.conteudo .botao-confirmar{
+    border-radius: 10%;
+    width: 15%;
+    height: 36px;
+    background-color: orangered;
+    border: solid transparent;
+    cursor: pointer;
+}
+
+.conteudo .botao-texto{
+    border-radius: 10%;
+    width: 15%;
+    height: 36px;
+    background-color: rgb(249, 255, 135);
+    border: solid transparent;
+    cursor: pointer;
+}
+
+#bTexto:hover{
+    transform: scale(1.1);
+}
+
+.conteudo .botao-imagemGifs{
+    border-radius: 10%;
+    width: 20%;
+    height: 36px;
+    background-color: rgb(249, 255, 135);
+    border: solid transparent;
+    cursor: pointer;
+}
+
+#bImagemGifs:hover{
+    transform: scale(1.1);
+}
+
+
+.janela-criar-flashcard{
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #00000080;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    
+}
+
+.janela-criar-flashcard.abrir{
+    display : flex
+}
+
+/* --- Estilos da Janela de Estudo --- */
+
+.janela-estudar {
+    width: 100vw;
+    max-height: 200vh;
+    min-height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    
+    background-color: rgb(233, 175, 40); /* Era #00000080 */
+    
+    display: none;
+    align-items: center;
+    justify-content: center;
+    
+}
+
+.conteudo-estudar{
+    position: relative;
+    width: 60%; 
+    height: auto;
+    background-color: gold;
+    padding: 10px;
+    border-radius: 20px;
+}
+
+.janela-estudar.abrir {
+    display: flex;
+}
+
+.voltar{
+    width: 100px;
+    height: 30px;
+    background-color: orangered;
+    position: absolute;
+    top: 20px; 
+    right: 50px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    border: transparent;
+    border-radius: 10px;
+}
+
+
+/* --- Estilos do Efeito de Virar (Flashcard) --- */
+
+.flashcard-container {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Define a perspectiva 3D */
+.flashcard {
+    background-color: transparent;
+    width: 400px; /* Largura do card */
+    height: 300px; /* Altura do card */
+    perspective: 1000px;
+    cursor: pointer;
+}
+
+/* O container que realmente vira */
+.flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d; /* Mantém o 3D */
+}
+
+/* Classe 'is-flipped' que será adicionada/removida pelo JS */
+.flashcard.is-flipped .flashcard-inner {
+    transform: rotateY(180deg);
+}
+
+/* Frente e Verso */
+.flashcard-front,
+.flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden; /* Safari */
+    backface-visibility: hidden; /* Esconde o lado de trás */
+    border-radius: 15px;
+    background-color: white;
+    border: 2px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Garante que a imagem não vaze */
+}
+
+/* O verso começa virado */
+.flashcard-back {
+    transform: rotateY(180deg);
+    background-color: #f0f0f0;
+}
+
+/* Estilo para as imagens dentro dos cards */
+.flashcard-front img,
+.flashcard-back img {
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: contain;
+}
+
+/* --- Estilos da Navegação --- */
+
+.navegacao-estudo {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.navegacao-estudo button {
+    border-radius: 10%;
+    width: 100px;
+    height: 36px;
+    background-color: orangered;
+    border: solid transparent;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+}
+
+.navegacao-estudo button:hover {
+    transform: scale(1.1);
+}
+
+/*area de criar sinais*/
+
+.container-montar{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    padding-top: 20px;
+}
+
+.dropzone{
+    width: 100%;
+    height: 200px;
+    border: 2px dashed #aaa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.Biblioteca{
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 300px;
+    height: 76vh;
+    background-color: orangered;
+    padding: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 9999;
+    border-radius: 30px;
+}
+
+.sighWritting-images{
+    height: 70%;
+    background-color: rgb(127, 38, 6);
+    border-radius: 30px;
+}
+
+.Biblioteca img{
+    padding: 20px;
+    width: 30px;
+    height: auto;
+    border-radius: 5px;
+}
+
+.selecao-par{
+    width: 100px;
+    height: 50px;
+    display: flex;
+}
+
+.selecao-par select{
+    width: 100px;
+    height: 30px;
+    padding: 5px;
+    border-radius: 20px;
+}
+
 
