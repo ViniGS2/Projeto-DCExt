@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Listener de fechar 'Estudar' agora limpa as URLs quando fecha
     if (janelaEstudar) {
         janelaEstudar.addEventListener('click', (e) => {
-            if (e.target.id == 'fechar-estudar' || e.target.id == 'janela-estudar') {
+            if (e.target.id == 'fechar-estudar') {
                 janelaEstudar.classList.remove('abrir');
                 deckSendoEstudado = null; 
                 
@@ -312,6 +312,65 @@ document.addEventListener('DOMContentLoaded', () => {
             janelaCriar.classList.remove('abrir');
         });
     }
+
+    //criar sinais
+
+    const dropzone = document.getElementById('dropzone');
+    const imgSinal = document.querySelectorAll('.draggable');
+
+    imgSinal.forEach(img =>{
+        img.addEventListener('click', (e) => {
+        const clone = img.cloneNode(true);
+        dropzone.appendChild(clone);
+        ativarArrasto(clone);
+    });
+
+    });
+
+    function ativarArrasto(img) {
+    img.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+
+    const shiftX = e.clientX - img.getBoundingClientRect().left;
+    const shiftY = e.clientY - img.getBoundingClientRect().top;
+
+    function mover(pageX, pageY) {
+      img.style.left = (pageX - shiftX - dropzone.getBoundingClientRect().left) + 'px';
+      img.style.top = (pageY - shiftY - dropzone.getBoundingClientRect().top) + 'px';
+    }
+
+    function aoMover(e) {
+      mover(e.pageX, e.pageY);
+    }
+
+    document.addEventListener('mousemove', aoMover);
+
+    img.onmouseup = () => {
+      document.removeEventListener('mousemove', aoMover);
+      img.onmouseup = null;
+    };
+  });
+
+  img.addEventListener('dblclick', (e) => {
+    img.remove();
+    });
+
+  img.ondragstart = () => false;
+}
+
+    const biblioteca = document.getElementById('Biblioteca');
+
+
+    biblioteca.addEventListener('click', (e) => {
+        if(biblioteca.classList.contains('open')){
+            biblioteca.classList.remove('open');
+        }
+        else{
+            biblioteca.classList.add('open');
+        }
+    })
+    
+    
 
     // inicia o js :)
     carregarDecks();
