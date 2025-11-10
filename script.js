@@ -374,4 +374,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // inicia o js :)
     carregarDecks();
-});
+s});
