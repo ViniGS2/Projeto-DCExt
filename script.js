@@ -32,9 +32,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnAnterior = document.getElementById('card-anterior');
 
     
-    // --- (localForage / IndexedDB) como armazenamos os dados ---
+    //SignMaker + Dropzone) -----
+    const modalSignMaker = document.getElementById('modal-signmaker');
+    const btnAbrirSignMakerEstudo = document.getElementById('abrir-signmaker-estudo');
+    const btnFecharSignMaker = document.getElementById('fechar-modal-signmaker');
+    const btnUsarSinalNaDropzone = document.getElementById('usar-sinal-na-dropzone');
+    const iframeSignMaker = document.getElementById('signmaker-iframe');
+    
+    const dropzone = document.getElementById('dropzone');
 
-    // salva o array decks no IndexedDB (assíncrono)
+    // Armazena a (FSW), não o SVG.
+    let ultimoFswRecebido = null; 
+
+
+    // --- (localForage / IndexedDB) como armazenamos os dados ---
     async function salvarDecks() {
         try {
             await localforage.setItem('signCardDecks', decks);
@@ -42,20 +53,12 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Erro ao salvar no localForage:", err);
         }
     }
-
-    // Desenha os decks do array decks no HTML
     function renderizarTodosDecks() {
-        container.innerHTML = ''; // Limpa o container
-
+        container.innerHTML = ''; 
         decks.forEach(deckData => {
-            // Cria o elemento do deck
             const novoDeck = document.createElement('div');
             novoDeck.classList.add('Deck');
-            
-            // Adiciona um id ao deck
             novoDeck.dataset.id = deckData.id;
-
-            // Usa o HTML com o layout que aparecena tela
             novoDeck.innerHTML = `
                 <h2>${deckData.name}</h2>
                 <p>${deckData.flashcards.length} card${deckData.flashcards.length !== 1 ? 's' : ''}</p>
@@ -67,11 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
             container.appendChild(novoDeck);
         });
     }
-
-    // Carrega os decks do IndexedDB ao iniciar (assíncrono)
     async function carregarDecks() {
         try {
-            // Não precisa de JSON.parse!
             const decksSalvos = await localforage.getItem('signCardDecks');
             if (decksSalvos) {
                 decks = decksSalvos;
@@ -82,9 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
     // --- Abrir janelas ---
-
     function abrirCriar(){
         janelaCriar.classList.add('abrir');
     }
@@ -94,8 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
         janelaEditar.classList.add('abrir');
     }
 
-    // Usa URL.createObjectURL() para mostrar os arquivos
-    // os cards agora guardam o Objeto "File" não mais o url da imagem/gifs
     function mostrarCard(index) {
         if (!deckSendoEstudado || !deckSendoEstudado[index]) return;
 
@@ -104,21 +100,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const versoEl = document.getElementById('flashcard-verso');
         const contadorEl = document.getElementById('contador-cards');
 
-        // limpa o conteúdo anterior
         frenteEl.innerHTML = '';
         versoEl.innerHTML = '';
 
-        // limpa as URLs temporárias antigas - já que não usamosmais
-        // Isso é crucial para não vazar memória!
         if (tempFrenteURL) URL.revokeObjectURL(tempFrenteURL);
         if (tempVersoURL) URL.revokeObjectURL(tempVersoURL);
 
-        //  tá criando URLs temporárias (Blob) para os arquivos
         try {
-            // card.frente e card.verso são objetos "File"
             tempFrenteURL = URL.createObjectURL(card.frente);
             tempVersoURL = URL.createObjectURL(card.verso);
-
             frenteEl.innerHTML = `<img src="${tempFrenteURL}" alt="Frente">`;
             versoEl.innerHTML = `<img src="${tempVersoURL}" alt="Verso">`;
         } catch (error) {
@@ -130,24 +120,19 @@ document.addEventListener('DOMContentLoaded', () => {
         flashcardEstudo.classList.remove('is-flipped');
     }
 
-    // SEM MUDANÇAS (Função em si) de abrir o estudar
     function abrirJanelaEstudar(deckData) {
         if (!deckData.flashcards || deckData.flashcards.length === 0) {
             alert("Este deck está vazio! Adicione cards no botão ✒️.");
             return;
         }
-
-        deckSendoEstudado = deckData.flashcards; // target no deck que vamos estudar
-        cardAtualIndex = 0; // começa do primeiro card
-
+        deckSendoEstudado = deckData.flashcards; 
+        cardAtualIndex = 0; 
         janelaEstudar.classList.add('abrir');
-        mostrarCard(cardAtualIndex); // Mostra o primeiro card
+        mostrarCard(cardAtualIndex); 
     }
 
     
     // --- LISTENERS das janelas ---
-
-    // Listeners para fechar Janelas
     if (janelaCriar) {
         janelaCriar.addEventListener('click', (e) => {
             if (e.target.id == 'fechar-criar' || e.target.id == 'janela-criar') {
@@ -162,18 +147,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    // Listener de fechar 'Estudar' agora limpa as URLs quando fecha
     if (janelaEstudar) {
         janelaEstudar.addEventListener('click', (e) => {
             if (e.target.id == 'fechar-estudar') {
                 janelaEstudar.classList.remove('abrir');
                 deckSendoEstudado = null; 
-                
-                // limpa as URLs temporárias ao fechar a janela 
                 if (tempFrenteURL) URL.revokeObjectURL(tempFrenteURL);
                 if (tempVersoURL) URL.revokeObjectURL(tempVersoURL);
                 tempFrenteURL = null;
                 tempVersoURL = null;
+                if (dropzone) dropzone.innerHTML = '';
             }
         });
     }
@@ -201,46 +184,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
-    // 3. listener para adicionar FLASHCARD (Salva oo Arquivos)
+    // 3. listener para adicionar FLASHCARD
     if (btnConfirmarEditar) {
-        btnConfirmarEditar.addEventListener('click', async () => { // <== TORNAR ASYNC
-            
-            // Pegamos os OBJETOS "File"
+        btnConfirmarEditar.addEventListener('click', async () => { 
             const frenteImagem = frenteInput?.files[0];
             const versoImagem = versoInput?.files[0];
-
             if (!frenteImagem || !versoImagem) {
                 alert("Selecione imagens para frente e verso antes de confirmar!");
                 return;
             }
-
-            if (deckAtual) { // 'deckAtual' é o elemento HTML
+            if (deckAtual) { 
                 try {
-                
                     const deckId = Number(deckAtual.dataset.id);
                     const deckNoDb = decks.find(d => d.id === deckId);
-
                     if (deckNoDb) {
-                        // adiciona os OBJETOS "File" diretamente 
                         deckNoDb.flashcards.push({
                             frente: frenteImagem,
                             verso: versoImagem
                         });
-                        
-                        await salvarDecks(); // Salva no IndexedDB
-
-                        // Atualiza o contador no HTML
+                        await salvarDecks(); 
                         const contador = deckAtual.querySelector('p');
                         const count = deckNoDb.flashcards.length;
                         contador.textContent = `${count} card${count > 1 ? 's' : ''}`;
                     }
-                    
-                    // limpa inputs e fecha
                     frenteInput.value = "";
                     versoInput.value = "";
                     janelaEditar.classList.remove('abrir');
-
                 } catch (err) {
                     alert("Erro ao salvar flashcard.");
                     console.error(err);
@@ -251,33 +220,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. Listener do CONTAINER (Deletar precisa ser async)
+    // 4. Listener do CONTAINER (Deletar/Editar/Estudar)
     if (container) {
-        container.addEventListener('click', async (e) => { // <== TORNAR ASYNC
+        container.addEventListener('click', async (e) => { 
             const deckElemento = e.target.closest('.Deck');
             if (!deckElemento) return; 
-
             const deckId = Number(deckElemento.dataset.id);
 
-            // Ação: DELETAR
             if (e.target.classList.contains('botao-deletar')) {
                 if (confirm(`Tem certeza que quer deletar o deck "${deckElemento.querySelector('h2').textContent}"?`)) {
-                    
-                    // Remove do array 'decks'
                     decks = decks.filter(d => d.id !== deckId);
-                    
-                    await salvarDecks(); //ADICIONAR AWAIT
-                    renderizarTodosDecks(); // O deck sumirá da tela
+                    await salvarDecks(); 
+                    renderizarTodosDecks(); 
                 }
             }
-
-            // Ação: EDITAR (Abrir janela de flashcards) 
             if (e.target.classList.contains('botao-editar')) {
                 deckAtual = deckElemento; 
                 AbrirEditar();
             }
-
-            // Ação: ESTUDAR 
             if (e.target.classList.contains('botao-estudar')) {
                 const deckData = decks.find(d => d.id === deckId);
                 if (deckData) {
@@ -287,91 +247,152 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 5. Listener para Criar novo DECK (precisa ser async)
+    // 5. Listener para Criar novo DECK
     if (btnConfirmar) {
-        btnConfirmar.addEventListener('click', async () => { // deixa  ASYNC
+        btnConfirmar.addEventListener('click', async () => { 
             const nomeDeck = nomeInput ? nomeInput.value.trim() : '';
             if (nomeDeck == "") {
                 alert("Digite um nome para o deck!");
                 return;
             }
-
-            // Cria um objeto de DADOS
             const novoDeckObj = {
-                id: Date.now(), // ID único
+                id: Date.now(), 
                 name: nomeDeck,
                 flashcards: []
             };
-
-            // Adiciona ao array 'decks' e salva/renderiza
             decks.push(novoDeckObj);
-            await salvarDecks(); // add AWAIT
-            renderizarTodosDecks(); // O novo deck aparecerá na tela
-
+            await salvarDecks(); 
+            renderizarTodosDecks(); 
             nomeInput.value = "";
             janelaCriar.classList.remove('abrir');
         });
     }
 
-    //criar sinais
-
-    const dropzone = document.getElementById('dropzone');
-    const imgSinal = document.querySelectorAll('.draggable');
-
-    imgSinal.forEach(img =>{
-        img.addEventListener('click', (e) => {
-        const clone = img.cloneNode(true);
-        dropzone.appendChild(clone);
-        ativarArrasto(clone);
-    });
-
-    });
 
     function ativarArrasto(img) {
     img.addEventListener('mousedown', (e) => {
-    e.preventDefault();
+        e.preventDefault();
+        const shiftX = e.clientX - img.getBoundingClientRect().left;
+        const shiftY = e.clientY - img.getBoundingClientRect().top;
 
-    const shiftX = e.clientX - img.getBoundingClientRect().left;
-    const shiftY = e.clientY - img.getBoundingClientRect().top;
+        // Bônus: faz o sinal ficar "na frente" de tudo
+        img.style.zIndex = 1000; 
 
-    function mover(pageX, pageY) {
-      img.style.left = (pageX - shiftX - dropzone.getBoundingClientRect().left) + 'px';
-      img.style.top = (pageY - shiftY - dropzone.getBoundingClientRect().top) + 'px';
-    }
+        function mover(pageX, pageY) {
+            let newLeft = pageX - shiftX - dropzone.getBoundingClientRect().left;
+            let newTop = pageY - shiftY - dropzone.getBoundingClientRect().top;
+            img.style.left = newLeft + 'px';
+            img.style.top = newTop + 'px';
+        }
 
-    function aoMover(e) {
-      mover(e.pageX, e.pageY);
-    }
+        function aoMover(e) {
+            mover(e.pageX, e.pageY);
+        }
 
-    document.addEventListener('mousemove', aoMover);
+        // Nova função para 'soltar'
+        function aoSoltar() {
+            img.style.zIndex = ''; // Volta ao normal
+            
+            // Remove os listeners do DOCUMENTO
+            document.removeEventListener('mousemove', aoMover);
+            document.removeEventListener('mouseup', aoSoltar);
+        }
 
-    img.onmouseup = () => {
-      document.removeEventListener('mousemove', aoMover);
-      img.onmouseup = null;
-    };
-  });
-
-  img.addEventListener('dblclick', (e) => {
-    img.remove();
+        // Adiciona os listeners de movimento E de soltar ao DOCUMENTO
+        document.addEventListener('mousemove', aoMover);
+        document.addEventListener('mouseup', aoSoltar);
     });
 
-  img.ondragstart = () => false;
+    img.addEventListener('dblclick', (e) => {
+        img.remove();
+    });
+
+    img.ondragstart = () => false;
 }
 
-    const biblioteca = document.getElementById('Biblioteca');
+
+    //Sign Maker
 
 
-    biblioteca.addEventListener('click', (e) => {
-        if(biblioteca.classList.contains('open')){
-            biblioteca.classList.remove('open');
+    // 1. Fica ouvindo o iframe o tempo todo
+    window.addEventListener('message', (event) => {
+        // Segurança
+        if (event.origin !== 'https://www.sutton-signwriting.io') {
+            return;
         }
-        else{
-            biblioteca.classList.add('open');
+
+        const data = event.data;
+        
+        // **usando log pra testarlakskaksaAAAAAAAAAAAAAAAaaa
+        // salvando o sinal**
+        if (data.signmaker === 'save' && data.fsw) {
+            console.log("+++ RECEITA (FSW) RECEBIDA E ARMAZENADA:", data.fsw);
+            ultimoFswRecebido = data.fsw;
         }
-    })
+    });
+
+
+    // 2. Abre o modal do SignMaker
+    if (btnAbrirSignMakerEstudo) {
+        btnAbrirSignMakerEstudo.addEventListener('click', () => {
+            // Limpa a receita antiga ao abrir
+            ultimoFswRecebido = null; 
+            modalSignMaker.classList.add('abrir');
+        });
+    }
+
+    // 3. Fecha o modal
+    if (btnFecharSignMaker) {
+        btnFecharSignMaker.addEventListener('click', () => {
+            modalSignMaker.classList.remove('abrir');
+        });
+    }
+
+    // 4. Botão "Usar este Sinal"
+    if (btnUsarSinalNaDropzone) {
+        btnUsarSinalNaDropzone.addEventListener('click', () => {
+            
+            // 1. Verifica se já recebeu uma receita (FSW)
+            if (!ultimoFswRecebido) {
+                alert("Sinal não detectado. Por favor, crie um sinal e clique no botão 'Save' (dentro do editor amarelo) primeiro.");
+                return;
+            }
+
+            // 2. Verifica se a biblioteca "cozinheira" (ssw) foi carregada
+            if (typeof ssw === 'undefined') {
+                alert("ERRO CRÍTICO: A biblioteca 'signview.js' (ssw) não foi carregada. Verifique o <head> do seu HTML.");
+                return;
+            }
+
+            // 3. trasforma em SVG USANDO A RECEITA FSW
+            // A função ssw.svg() é da biblioteca signview.js
+            const svgString = ssw.svg(ultimoFswRecebido);
+
+            if (!svgString || svgString.trim() === "") {
+                alert("A biblioteca ssw não conseguiu criar um SVG a partir do FSW. (fsw: " + ultimoFswRecebido + ")");
+                return;
+            }
+
+            // 4. Cria o elemento
+            const sinalElement = document.createElement('div');
+            sinalElement.classList.add('draggable'); 
+            sinalElement.innerHTML = svgString; // USA O SVG QUE NÓS CRIAMOS      
+            sinalElement.style.position = 'absolute'; 
+            sinalElement.style.left = '10px';        
+            sinalElement.style.top = '10px';
+
+            // 5. Adiciona na dropzone
+            dropzone.appendChild(sinalElement);
+
+            // 6. Ativa o arrasto (CHAMA SUA FUNÇÃO!)
+            ativarArrasto(sinalElement);
+
+            // 7. Fecha o modal
+            modalSignMaker.classList.remove('abrir');
+        });
+    }
     
     
-
     // inicia o js :)
     carregarDecks();
-s});
+});

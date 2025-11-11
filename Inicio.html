@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Card</title>
+    
+    <link rel="stylesheet" href="https://www.sutton-signwriting.io/signmaker/index.css">
+    
     <link rel="stylesheet" href="Estilos.css">
+    
+    <script src="https://www.sutton-signwriting.io/signmaker/lib/SuttonSignWriting.min.js?v=2.1.1"></script>
+    
 </head>
 <body>
     
@@ -77,31 +83,33 @@
             </div>
             
             <div class="container-montar">
+                <h4>Monte o sinal:</h4>
                 <div class="dropzone" id="dropzone"></div>
-            </div>
-            </div>
-        
-        <div class="Biblioteca" id="Biblioteca">
-            <h3>   Biblioteca de sinais</h3>
-            <div class="selecao-par" id="selecao-par">
-            <label for="parametro">Parâmetros: </label>
-            <select id="parametros" name="parametros">
-                <option value="par1">par1</option>
-                <option value="par2">par2</option>
-                <option value="par3">par3</option>
-                <option value="par4">par4</option>
-                <option value="par5">par5</option>
-            </select>
-            </div>
-            <div class="sighWritting-images">
-            <img src="imagens/01-01-001-01-02.png" class="draggable">
+                
+                <button type="button" class="botao-signwriting" id="abrir-signmaker-estudo">
+                    Abrir Editor de Sinais (SignMaker)
+                </button>
+                
             </div>
         </div>
-    </div>
+        
+        </div>
 
     
     <div id="container-decks">
+    </div>
+
+    <div class="modal-signmaker" id="modal-signmaker">
+        <div class="modal-conteudo">
+            <button class="fechar-modal" id="fechar-modal-signmaker">X</button>
+            <h3>Criador de Sinais (SignMaker)</h3>
+            <iframe id="signmaker-iframe" 
+                    src="https://www.sutton-signwriting.io/signmaker/" 
+                    style="width: 100%; height: 60vh; border: 1px solid #000;">
+            </iframe>
+            <button class="botao-confirmar" id="usar-sinal-na-dropzone">Usar este Sinal</button>
         </div>
+    </div>
     
     <script src="script.js"></script>
 </body>
