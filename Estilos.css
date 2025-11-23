@@ -51,7 +51,7 @@ html, body{
     height: 30px;
     border-radius: 50%;
     border: #00000080;
-    background-color: red;
+    background-color: orangered;
     cursor: pointer;
 }
 
@@ -64,8 +64,10 @@ html, body{
     width: 200px;
     height: 50px;
     border: #00000080;
+    color: rgb(0, 0, 0);
     background-color: orangered;
     cursor: pointer;
+    font-weight: bold;
 }
 
 .pag-criar-elems {
@@ -92,33 +94,33 @@ html, body{
     border-radius: 10%;
     width: 56%;
     height: 30%;
-    background-color: rgb(127, 38, 6); /* orangered */
+    background-color: orangered; /* orangered */
     border: #00000080;
 }
 
 .Deck p{
-    border-radius: 20%;
-    background-color: rgba(213, 139, 0, 0.915);
+    border-radius: 15%;
+    background-color: orange;
     width: 25%;
 }
 
 .botao-editar {
     border-radius: 10%;
-    background-color: rgb(127, 38, 6);
+    background-color: orangered;
     border: #00000080;
     height: 27%;
 }
 
 .botao-deletar {
     border-radius: 10%;
-    background-color: rgb(127, 38, 6);
+    background-color: orangered;
     border: #00000080;
     height: 27%;
 }
 
 .botao-exportar {
     border-radius: 10%;
-    background-color: rgb(127, 38, 6); 
+    background-color: orangered; 
     color: white;
     border: #00000080;
     height: 27%;
@@ -148,8 +150,8 @@ html, body{
     border-radius: 10px;
     border: 10px solid transparent;
     width: 60%;
-    height: 30px;
-    background-color: rgba(213, 139, 0, 0.915);
+    height: 40px;
+    background-color: orange;
 }
 
 .conteudo .botao-confirmar{
@@ -165,7 +167,7 @@ html, body{
     border-radius: 10%;
     width: 15%;
     height: 36px;
-    background-color: rgb(249, 255, 135);
+    background-color: orangered;
     border: solid transparent;
     cursor: pointer;
 }
@@ -178,7 +180,7 @@ html, body{
     border-radius: 10%;
     width: 20%;
     height: 36px;
-    background-color: rgb(249, 255, 135);
+    background-color: orangered;
     border: solid transparent;
     cursor: pointer;
 }
@@ -213,10 +215,11 @@ html, body{
     max-height: 200vh;
     min-height: 100vh;
     position: absolute;
+    text-align: center;
     top: 0;
     left: 0;
     
-    background-color: rgb(233, 175, 40); 
+    background-color: gold; 
     
     display: none;
     align-items: center;
@@ -344,6 +347,7 @@ html, body{
 
 .container-montar{
     display: flex;
+    text-align: center;
     flex-direction: column;
     margin-bottom: 20px;
     padding-top: 20px;
@@ -352,8 +356,10 @@ html, body{
 .dropzone{
     position: relative;
     width: 100%;
-    height: 200px;
-    border: 2px dashed #aaa;
+    height: 250px;
+    background-color: #ffffff; 
+    border: solid orangered; 
+    
     display: flex;
     align-items: center;
     justify-content: center;
@@ -432,7 +438,7 @@ html, body{
     border-radius: 20px;
 }
 
-/* SignMaker--- */
+/* SignMaker */
 
 .modal-signmaker {
     width: 100vw;
@@ -448,7 +454,7 @@ html, body{
 }
 
 .modal-signmaker.abrir {
-    display: flex; /* Mostra o modal */
+    display: flex; /* mostra o modal */
 }
 
 .modal-signmaker .modal-conteudo {
@@ -469,7 +475,7 @@ html, body{
     height: 30px;
     border-radius: 50%;
     border: none;
-    background-color: red;
+    background-color: orangered;
     cursor: pointer;
     color: white;
     font-weight: bold;
@@ -481,7 +487,7 @@ html, body{
     border-radius: 10px;
     width: 100%;
     height: 40px;
-    background-color: red; 
+    background-color: orangered; 
     color: white;
     border: solid transparent;
     cursor: pointer;
@@ -494,10 +500,10 @@ html, body{
 
 .draggable{
     position: absolute;
-    width: 180px; 
-    height: 180px; 
-    max-width: 200px; 
-    max-height: 200px; 
+    width: 230px; 
+    height: 230px; 
+    max-width: 250px; 
+    max-height: 250px; 
     
     cursor: grab;
     user-select: none;
@@ -517,4 +523,70 @@ html, body{
     width: auto; 
     height: auto; 
     display: block;
+}
+
+/*importar botçao*/
+
+
+#input-importar {
+    display: none;
+}
+
+
+#label-importar-deck.botao-importar {
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    
+    width: 200px;
+    height: 50px;
+    
+    border-radius: 10%;
+    
+    background-color: orangered; 
+    color: white;
+    border: #00000080;
+    
+    cursor: pointer;
+    font-weight: bold;
+    user-select: none; 
+}
+
+#label-importar-deck.botao-importar:hover {
+    transform: scale(1.1);
+}
+
+
+#input-importar {
+    display: none !important;
+}
+
+#label-importar-deck {
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    
+    width: 200px;
+    height: 50px;
+    
+    border-radius: 10%;
+    
+    background-color: orangered; 
+    color: rgb(0, 0, 0);
+    border: #00000000;
+    
+    cursor: pointer;
+    font-weight: bold;
+    user-select: none;
+    
+    line-height: 1; 
+    padding: 0 10px;
+}
+
+#label-importar-deck:hover {
+    transform: scale(1.1);
 }
