@@ -22,7 +22,11 @@
             <p>"Crie os seus flash cards"</p>
             <br>
         </div>
-        <button type="button" id="botao-criar" onclick="abrirCriar()">+ Criar Deck</button>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <label for="input-importar" style="font-weight: bold;">Importar Deck:</label>
+            <input type="file" id="input-importar" accept=".json">
+            <button type="button" id="botao-criar" onclick="abrirCriar()">+ Criar Deck</button>
+        </div>
     </div>
 
     <div class="janela-criar" id="janela-criar">

@@ -1,7 +1,9 @@
 #CabecalhoInic{
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; 
     align-items: center;
+    width: 100%; 
+    margin-bottom: 20px; 
 }
 
 body{
@@ -114,6 +116,21 @@ html, body{
     height: 27%;
 }
 
+/* NOVO ESTILO: Botão de Exportar */
+.botao-exportar {
+    border-radius: 10%;
+    background-color: rgb(127, 38, 6); 
+    color: white;
+    border: #00000080;
+    height: 27%;
+    cursor: pointer;
+}
+
+.botao-exportar:hover {
+    transform: scale(1.1);
+}
+/* FIM NOVO ESTILO */
+
 .Deck button{
     cursor: pointer;
 }
@@ -123,10 +140,10 @@ html, body{
 }
 
 #container-decks {
-    display: flex;          /* em linhas*/
-    flex-wrap: wrap;        /* quebra linha*/ 
-    gap: 64px;              
-    margin-top: 20px;       
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 64px; 
+    margin-top: 20px; 
 }
 
 .conteudo input{
@@ -201,7 +218,7 @@ html, body{
     top: 0;
     left: 0;
     
-    background-color: rgb(233, 175, 40); /* Era #00000080 */
+    background-color: rgb(233, 175, 40); 
     
     display: none;
     align-items: center;
@@ -503,5 +520,3 @@ html, body{
     height: auto; 
     display: block;
 }
-
-

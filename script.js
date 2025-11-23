@@ -1,38 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ===== Variável Global  =====
-    let decks = []; // Lista com todos os decksss
-    
-    // Variáveis globais
-    let deckAtual = null; // da target no deck sendo utilizado
-    let deckSendoEstudado = null; //target no deck sendo estudado
+    let decks = []; 
+    let deckAtual = null; 
+    let deckSendoEstudado = null; 
     let cardAtualIndex = 0; 
 
-    // variáveis parausar o IndexDB - são globais
     let tempFrenteURL = null;
     let tempVersoURL = null;
 
-    // Container dos decks - onde os decks eles estarâo
     const container = document.getElementById('container-decks');
     
-    // variáveis para AbrirJanela()
     const janelaCriar = document.getElementById('janela-criar');
     const btnConfirmar = document.getElementById('confirmar');
     const nomeInput = document.querySelector('input[name="nome-deck"]');
 
-    // Variáveis da Janela Criar/EditarFlashcard() 
     const janelaEditar = document.getElementById('janela-criar-flashcard');
     const btnConfirmarEditar = document.getElementById('confirmarEditar');
     const frenteInput = document.getElementById('frente-flashcard-img');
     const versoInput = document.getElementById('verso-flashcard-img');
     
-    // Varáveis da janelaEstuar
     const janelaEstudar = document.getElementById('janela-estudar');
     const flashcardEstudo = document.getElementById('flashcard-estudo');
     const btnProximo = document.getElementById('card-proximo');
     const btnAnterior = document.getElementById('card-anterior');
-
     
-    //SignMaker + Dropzone) -----
     const modalSignMaker = document.getElementById('modal-signmaker');
     const btnAbrirSignMakerEstudo = document.getElementById('abrir-signmaker-estudo');
     const btnFecharSignMaker = document.getElementById('fechar-modal-signmaker');
@@ -41,11 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const dropzone = document.getElementById('dropzone');
 
-    // Armazena a (FSW), não o SVG.
     let ultimoFswRecebido = null; 
+    
+    const inputImportar = document.getElementById('input-importar');
 
-
-    // --- (localForage / IndexedDB) como armazenamos os dados ---
     async function salvarDecks() {
         try {
             await localforage.setItem('signCardDecks', decks);
@@ -53,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Erro ao salvar no localForage:", err);
         }
     }
+
     function renderizarTodosDecks() {
         container.innerHTML = ''; 
         decks.forEach(deckData => {
@@ -65,11 +55,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="botao-estudar">Estudar</button>
                 <button class="botao-editar">✒️</button> 
                 <button class="botao-deletar">🗑️</button>
+                <button class="botao-exportar">🔗</button> 
                 </div>
             `;
             container.appendChild(novoDeck);
         });
     }
+
     async function carregarDecks() {
         try {
             const decksSalvos = await localforage.getItem('signCardDecks');
@@ -82,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Abrir janelas ---
     function abrirCriar(){
         janelaCriar.classList.add('abrir');
     }
@@ -131,8 +122,6 @@ document.addEventListener('DOMContentLoaded', () => {
         mostrarCard(cardAtualIndex); 
     }
 
-    
-    // --- LISTENERS das janelas ---
     if (janelaCriar) {
         janelaCriar.addEventListener('click', (e) => {
             if (e.target.id == 'fechar-criar' || e.target.id == 'janela-criar') {
@@ -161,7 +150,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 2. listeners de Navegação/Estudo 
     if (flashcardEstudo) {
         flashcardEstudo.addEventListener('click', () => {
             flashcardEstudo.classList.toggle('is-flipped');
@@ -184,7 +172,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 3. listener para adicionar FLASHCARD
     if (btnConfirmarEditar) {
         btnConfirmarEditar.addEventListener('click', async () => { 
             const frenteImagem = frenteInput?.files[0];
@@ -220,12 +207,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. Listener do CONTAINER (Deletar/Editar/Estudar)
     if (container) {
         container.addEventListener('click', async (e) => { 
             const deckElemento = e.target.closest('.Deck');
             if (!deckElemento) return; 
             const deckId = Number(deckElemento.dataset.id);
+            const deckData = decks.find(d => d.id === deckId);
 
             if (e.target.classList.contains('botao-deletar')) {
                 if (confirm(`Tem certeza que quer deletar o deck "${deckElemento.querySelector('h2').textContent}"?`)) {
@@ -239,15 +226,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 AbrirEditar();
             }
             if (e.target.classList.contains('botao-estudar')) {
-                const deckData = decks.find(d => d.id === deckId);
                 if (deckData) {
                     abrirJanelaEstudar(deckData);
+                }
+            }
+            // listener para o botão de Exportar
+            if (e.target.classList.contains('botao-exportar')) {
+                if (deckData) {
+                    await exportarDeck(deckData);
                 }
             }
         });
     }
 
-    // 5. Listener para Criar novo DECK
     if (btnConfirmar) {
         btnConfirmar.addEventListener('click', async () => { 
             const nomeDeck = nomeInput ? nomeInput.value.trim() : '';
@@ -268,14 +259,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
     function ativarArrasto(img) {
     img.addEventListener('mousedown', (e) => {
         e.preventDefault();
         const shiftX = e.clientX - img.getBoundingClientRect().left;
         const shiftY = e.clientY - img.getBoundingClientRect().top;
 
-        // Bônus: faz o sinal ficar "na frente" de tudo
         img.style.zIndex = 1000; 
 
         function mover(pageX, pageY) {
@@ -289,16 +278,13 @@ document.addEventListener('DOMContentLoaded', () => {
             mover(e.pageX, e.pageY);
         }
 
-        // Nova função para 'soltar'
         function aoSoltar() {
-            img.style.zIndex = ''; // Volta ao normal
+            img.style.zIndex = ''; 
             
-            // Remove os listeners do DOCUMENTO
             document.removeEventListener('mousemove', aoMover);
             document.removeEventListener('mouseup', aoSoltar);
         }
 
-        // Adiciona os listeners de movimento E de soltar ao DOCUMENTO
         document.addEventListener('mousemove', aoMover);
         document.addEventListener('mouseup', aoSoltar);
     });
@@ -311,61 +297,46 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 
 
-    //Sign Maker
-
-
-    // 1. Fica ouvindo o iframe o tempo todo
     window.addEventListener('message', (event) => {
-        // Segurança
         if (event.origin !== 'https://www.sutton-signwriting.io') {
             return;
         }
 
         const data = event.data;
         
-        // **usando log pra testarlakskaksaAAAAAAAAAAAAAAAaaa
-        // salvando o sinal**
         if (data.signmaker === 'save' && data.fsw) {
-            console.log("+++ RECEITA (FSW) RECEBIDA E ARMAZENADA:", data.fsw);
+            console.log("+++ FSW Recebida +++");
             ultimoFswRecebido = data.fsw;
         }
     });
 
 
-    // 2. Abre o modal do SignMaker
     if (btnAbrirSignMakerEstudo) {
         btnAbrirSignMakerEstudo.addEventListener('click', () => {
-            // Limpa a receita antiga ao abrir
             ultimoFswRecebido = null; 
             modalSignMaker.classList.add('abrir');
         });
     }
 
-    // 3. Fecha o modal
     if (btnFecharSignMaker) {
         btnFecharSignMaker.addEventListener('click', () => {
             modalSignMaker.classList.remove('abrir');
         });
     }
 
-    // 4. Botão "Usar este Sinal"
     if (btnUsarSinalNaDropzone) {
         btnUsarSinalNaDropzone.addEventListener('click', () => {
             
-            // 1. Verifica se já recebeu uma receita (FSW)
             if (!ultimoFswRecebido) {
                 alert("Sinal não detectado. Por favor, crie um sinal e clique no botão 'Save' (dentro do editor amarelo) primeiro.");
                 return;
             }
 
-            // 2. Verifica se a biblioteca "cozinheira" (ssw) foi carregada
             if (typeof ssw === 'undefined') {
                 alert("ERRO CRÍTICO: A biblioteca 'signview.js' (ssw) não foi carregada. Verifique o <head> do seu HTML.");
                 return;
             }
 
-            // 3. trasforma em SVG USANDO A RECEITA FSW
-            // A função ssw.svg() é da biblioteca signview.js
             const svgString = ssw.svg(ultimoFswRecebido);
 
             if (!svgString || svgString.trim() === "") {
@@ -373,26 +344,148 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // 4. Cria o elemento
             const sinalElement = document.createElement('div');
             sinalElement.classList.add('draggable'); 
-            sinalElement.innerHTML = svgString; // USA O SVG QUE NÓS CRIAMOS      
+            sinalElement.innerHTML = svgString;      
             sinalElement.style.position = 'absolute'; 
-            sinalElement.style.left = '10px';        
+            sinalElement.style.left = '10px';        
             sinalElement.style.top = '10px';
 
-            // 5. Adiciona na dropzone
             dropzone.appendChild(sinalElement);
 
-            // 6. Ativa o arrasto (CHAMA SUA FUNÇÃO!)
             ativarArrasto(sinalElement);
 
-            // 7. Fecha o modal
             modalSignMaker.classList.remove('abrir');
         });
     }
     
+    // parte de importação
+   
+    function blobToBase64(blob) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    }
     
-    // inicia o js :)
+    function base64ToBlob(base64) {
+        const parts = base64.split(';base64,');
+        if (parts.length < 2) return new Blob();
+        
+        const finalMimeType = parts[0].split(':')[1]; 
+        
+        const byteString = atob(parts[1]); 
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const intArray = new Uint8Array(arrayBuffer);
+        
+        for (let i = 0; i < byteString.length; i++) {
+            intArray[i] = byteString.charCodeAt(i);
+        }
+        
+        return new Blob([arrayBuffer], { type: finalMimeType });
+    }
+
+    async function exportarDeck(deck) {
+        const deckExport = {
+            name: deck.name,
+            flashcards: []
+        };
+        
+        for (const card of deck.flashcards) {
+            if (card.frente instanceof Blob && card.verso instanceof Blob) {
+                 const frenteBase64 = await blobToBase64(card.frente);
+                 const versoBase64 = await blobToBase64(card.verso);
+                 deckExport.flashcards.push({
+                     frente: frenteBase64,
+                     verso: versoBase64,
+                 });
+            }
+        }
+
+        if (deckExport.flashcards.length === 0) {
+            alert("Este deck não contém flashcards com imagens para exportar.");
+            return;
+        }
+
+        const jsonString = JSON.stringify(deckExport, null, 2);
+        const dataBlob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `SignCard_Deck_${deck.name.replace(/\s/g, '_')}_${Date.now()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        alert(`Deck "${deck.name}" exportado com sucesso! Arquivo salvo como ${a.download}`);
+    }
+
+    if (inputImportar) {
+        inputImportar.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file || file.type !== 'application/json') {
+                alert("Selecione um arquivo JSON válido para importar.");
+                e.target.value = '';
+                return;
+            }
+
+            try {
+                const fileText = await file.text();
+                const deckImport = JSON.parse(fileText);
+                
+                if (!deckImport.name || !Array.isArray(deckImport.flashcards)) {
+                     throw new Error("Formato de deck inválido.");
+                }
+                
+                const novoFlashcards = [];
+                
+                for (const card of deckImport.flashcards) {
+                    if (!card.frente.startsWith('data:') || !card.verso.startsWith('data:')) {
+                         console.error("Card com Base64 corrompido, pulando.");
+                         continue;
+                    }
+                    
+                    const frenteBlob = base64ToBlob(card.frente);
+                    const versoBlob = base64ToBlob(card.verso);
+                    
+                    novoFlashcards.push({
+                        frente: new File([frenteBlob], 'frente-import', { type: frenteBlob.type }),
+                        verso: new File([versoBlob], 'verso-import', { type: versoBlob.type }),
+                    });
+                }
+                
+                if (novoFlashcards.length === 0) {
+                     alert("O arquivo não continha flashcards válidos para importação.");
+                     e.target.value = '';
+                     return;
+                }
+
+                const novoDeckObj = {
+                    id: Date.now(), 
+                    name: deckImport.name + " (Importado)",
+                    flashcards: novoFlashcards
+                };
+
+                decks.push(novoDeckObj);
+                await salvarDecks(); 
+                renderizarTodosDecks(); 
+                alert(`Deck "${novoDeckObj.name}" importado com sucesso, com ${novoFlashcards.length} cards!`);
+
+            } catch (err) {
+                alert(`Erro ao importar o arquivo: ${err.message}. Verifique se o arquivo está correto.`);
+                console.error(err);
+            } finally {
+                e.target.value = ''; 
+            }
+        });
+    }
+    
+    // ==========================================================
+
     carregarDecks();
 });
