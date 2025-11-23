@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-    let decks = []; 
-    let deckAtual = null; 
-    let deckSendoEstudado = null; 
-    let cardAtualIndex = 0; 
+    let decks = [];
+    let deckAtual = null;
+    let deckSendoEstudado = null;
+    let cardAtualIndex = 0;
 
     let tempFrenteURL = null;
     let tempVersoURL = null;
@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnConfirmarEditar = document.getElementById('confirmarEditar');
     const frenteInput = document.getElementById('frente-flashcard-img');
     const versoInput = document.getElementById('verso-flashcard-img');
+    const nomeDeckEditarInput = document.getElementById('input-editar-nome');
     
     const janelaEstudar = document.getElementById('janela-estudar');
     const flashcardEstudo = document.getElementById('flashcard-estudo');
@@ -31,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const dropzone = document.getElementById('dropzone');
 
-    let ultimoFswRecebido = null; 
+    let ultimoFswRecebido = null;
     
     const inputImportar = document.getElementById('input-importar');
 
@@ -44,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderizarTodosDecks() {
-        container.innerHTML = ''; 
+        container.innerHTML = '';
         decks.forEach(deckData => {
             const novoDeck = document.createElement('div');
             novoDeck.classList.add('Deck');
@@ -53,9 +54,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h2>${deckData.name}</h2>
                 <p>${deckData.flashcards.length} card${deckData.flashcards.length !== 1 ? 's' : ''}</p>
                 <button class="botao-estudar">Estudar</button>
-                <button class="botao-editar">✒️</button> 
+                <button class="botao-editar">✒️</button>
                 <button class="botao-deletar">🗑️</button>
-                <button class="botao-exportar">🔗</button> 
+                <button class="botao-exportar">🔗</button>
                 </div>
             `;
             container.appendChild(novoDeck);
@@ -79,7 +80,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     window.abrirCriar = abrirCriar;
 
-    function AbrirEditar(){
+    function AbrirEditar(deckData){
+        if (deckData && nomeDeckEditarInput) {
+            nomeDeckEditarInput.value = deckData.name;
+        }
         janelaEditar.classList.add('abrir');
     }
 
@@ -98,13 +102,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tempVersoURL) URL.revokeObjectURL(tempVersoURL);
 
         try {
-            tempFrenteURL = URL.createObjectURL(card.frente);
-            tempVersoURL = URL.createObjectURL(card.verso);
-            frenteEl.innerHTML = `<img src="${tempFrenteURL}" alt="Frente">`;
-            versoEl.innerHTML = `<img src="${tempVersoURL}" alt="Verso">`;
+            // verifica se a frente e o verso são objetos Blob ou File antes de criar a URL (novamente pra exp ou imp)
+            if (card.frente instanceof Blob && card.verso instanceof Blob) {
+                tempFrenteURL = URL.createObjectURL(card.frente);
+                tempVersoURL = URL.createObjectURL(card.verso);
+                frenteEl.innerHTML = `<img src="${tempFrenteURL}" alt="Frente">`;
+                versoEl.innerHTML = `<img src="${tempVersoURL}" alt="Verso">`;
+            } else {
+                 // Caso não sejam Blobs (verificação pra exportação e a importação)
+                frenteEl.innerHTML = 'Conteúdo indisponível';
+                versoEl.innerHTML = 'Conteúdo indisponível';
+            }
         } catch (error) {
             console.error("Erro ao criar URL do objeto:", error);
             frenteEl.innerHTML = 'Erro ao carregar imagem';
+            versoEl.innerHTML = 'Erro ao carregar imagem';
         }
 
         contadorEl.textContent = `${index + 1} / ${deckSendoEstudado.length}`;
@@ -116,10 +128,10 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Este deck está vazio! Adicione cards no botão ✒️.");
             return;
         }
-        deckSendoEstudado = deckData.flashcards; 
-        cardAtualIndex = 0; 
+        deckSendoEstudado = deckData.flashcards;
+        cardAtualIndex = 0;
         janelaEstudar.classList.add('abrir');
-        mostrarCard(cardAtualIndex); 
+        mostrarCard(cardAtualIndex);
     }
 
     if (janelaCriar) {
@@ -133,6 +145,11 @@ document.addEventListener('DOMContentLoaded', () => {
         janelaEditar.addEventListener('click', (e) => {
             if (e.target.id == 'fechar-flashcard' || e.target.id == 'janela-criar-flashcard') {
                 janelaEditar.classList.remove('abrir');
+                // Limpa os inputs de arquivo ao fechar, se não for por confirmação
+                if (e.target.id !== 'confirmarEditar') {
+                    frenteInput.value = "";
+                    versoInput.value = "";
+                }
             }
         });
     }
@@ -140,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
         janelaEstudar.addEventListener('click', (e) => {
             if (e.target.id == 'fechar-estudar') {
                 janelaEstudar.classList.remove('abrir');
-                deckSendoEstudado = null; 
+                deckSendoEstudado = null;
                 if (tempFrenteURL) URL.revokeObjectURL(tempFrenteURL);
                 if (tempVersoURL) URL.revokeObjectURL(tempVersoURL);
                 tempFrenteURL = null;
@@ -173,32 +190,58 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (btnConfirmarEditar) {
-        btnConfirmarEditar.addEventListener('click', async () => { 
+          btnConfirmarEditar.addEventListener('click', async () => {
+
             const frenteImagem = frenteInput?.files[0];
             const versoImagem = versoInput?.files[0];
-            if (!frenteImagem || !versoImagem) {
-                alert("Selecione imagens para frente e verso antes de confirmar!");
+            const novoNome = nomeDeckEditarInput.value.trim();
+
+            if (novoNome === "") {
+                alert("O nome do deck não pode ficar vazio!");
                 return;
-            }
-            if (deckAtual) { 
+               }
+            
+            if (deckAtual) {
                 try {
                     const deckId = Number(deckAtual.dataset.id);
-                    const deckNoDb = decks.find(d => d.id === deckId);
-                    if (deckNoDb) {
-                        deckNoDb.flashcards.push({
-                            frente: frenteImagem,
-                            verso: versoImagem
-                        });
-                        await salvarDecks(); 
-                        const contador = deckAtual.querySelector('p');
-                        const count = deckNoDb.flashcards.length;
-                        contador.textContent = `${count} card${count > 1 ? 's' : ''}`;
+                    let deckNoDb = decks.find(d => d.id === deckId);
+
+                if (deckNoDb) {
+                        // atualiza o nomedo deck se tiver mudado
+                        deckNoDb.name = novoNome;
+                        deckAtual.querySelector('h2').textContent = novoNome; 
+
+                        // adiciona os cards
+                        let cardAdicionado = false;
+                        if (frenteImagem && versoImagem) {
+                            deckNoDb.flashcards.push({
+                                frente: frenteImagem,
+                                verso: versoImagem
+                            });
+                            cardAdicionado = true;
+                        } else if (frenteInput.files.length > 0 || versoInput.files.length > 0) {
+                            alert("Para adicionar um novo flashcard, selecione imagens para a frente E o verso.");
+                            return;
+                        }
+
+                        await salvarDecks();
+
+                        // atualiza o contadorr
+                        if (cardAdicionado) {
+                            const contador = deckAtual.querySelector('p');
+                            const count = deckNoDb.flashcards.length;
+                            contador.textContent = `${count} card${count > 1 ? 's' : ''}`;
+                        }
+                        
+                        // limpa a janela e fecha
+                        if (cardAdicionado) {
+                            frenteInput.value = "";
+                            versoInput.value = "";
+                        }
+                        janelaEditar.classList.remove('abrir');
                     }
-                    frenteInput.value = "";
-                    versoInput.value = "";
-                    janelaEditar.classList.remove('abrir');
                 } catch (err) {
-                    alert("Erro ao salvar flashcard.");
+                    alert("Erro ao salvar edição.");
                     console.error(err);
                 }
             } else {
@@ -208,22 +251,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (container) {
-        container.addEventListener('click', async (e) => { 
+        container.addEventListener('click', async (e) => {
             const deckElemento = e.target.closest('.Deck');
-            if (!deckElemento) return; 
+            if (!deckElemento) return;
             const deckId = Number(deckElemento.dataset.id);
             const deckData = decks.find(d => d.id === deckId);
 
             if (e.target.classList.contains('botao-deletar')) {
                 if (confirm(`Tem certeza que quer deletar o deck "${deckElemento.querySelector('h2').textContent}"?`)) {
                     decks = decks.filter(d => d.id !== deckId);
-                    await salvarDecks(); 
-                    renderizarTodosDecks(); 
+                    await salvarDecks();
+                    renderizarTodosDecks();
                 }
             }
             if (e.target.classList.contains('botao-editar')) {
-                deckAtual = deckElemento; 
-                AbrirEditar();
+                deckAtual = deckElemento;
+                AbrirEditar(deckData);
             }
             if (e.target.classList.contains('botao-estudar')) {
                 if (deckData) {
@@ -240,20 +283,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (btnConfirmar) {
-        btnConfirmar.addEventListener('click', async () => { 
+        btnConfirmar.addEventListener('click', async () => {
             const nomeDeck = nomeInput ? nomeInput.value.trim() : '';
             if (nomeDeck == "") {
                 alert("Digite um nome para o deck!");
                 return;
             }
             const novoDeckObj = {
-                id: Date.now(), 
+                id: Date.now(),
                 name: nomeDeck,
                 flashcards: []
             };
             decks.push(novoDeckObj);
-            await salvarDecks(); 
-            renderizarTodosDecks(); 
+            await salvarDecks();
+            renderizarTodosDecks();
             nomeInput.value = "";
             janelaCriar.classList.remove('abrir');
         });
@@ -265,11 +308,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const shiftX = e.clientX - img.getBoundingClientRect().left;
         const shiftY = e.clientY - img.getBoundingClientRect().top;
 
-        img.style.zIndex = 1000; 
+        img.style.zIndex = 1000;
 
         function mover(pageX, pageY) {
+            // As coordenadas são relativas à dropzone
             let newLeft = pageX - shiftX - dropzone.getBoundingClientRect().left;
             let newTop = pageY - shiftY - dropzone.getBoundingClientRect().top;
+            
+            // Garante que não ultrapasse os limites da dropzone
+            newLeft = Math.max(0, Math.min(newLeft, dropzone.clientWidth - img.clientWidth));
+            newTop = Math.max(0, Math.min(newTop, dropzone.clientHeight - img.clientHeight));
+
             img.style.left = newLeft + 'px';
             img.style.top = newTop + 'px';
         }
@@ -279,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function aoSoltar() {
-            img.style.zIndex = ''; 
+            img.style.zIndex = '';
             
             document.removeEventListener('mousemove', aoMover);
             document.removeEventListener('mouseup', aoSoltar);
@@ -313,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnAbrirSignMakerEstudo) {
         btnAbrirSignMakerEstudo.addEventListener('click', () => {
-            ultimoFswRecebido = null; 
+            ultimoFswRecebido = null;
             modalSignMaker.classList.add('abrir');
         });
     }
@@ -345,11 +394,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const sinalElement = document.createElement('div');
-            sinalElement.classList.add('draggable'); 
-            sinalElement.innerHTML = svgString;      
-            sinalElement.style.position = 'absolute'; 
-            sinalElement.style.left = '10px';        
+            sinalElement.classList.add('draggable');
+            sinalElement.innerHTML = svgString;
+            sinalElement.style.position = 'absolute';
+            sinalElement.style.left = '10px';
             sinalElement.style.top = '10px';
+            sinalElement.style.cursor = 'grab'; // Adiciona um cursor de arraste
 
             dropzone.appendChild(sinalElement);
 
@@ -360,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // parte de importação
-   
+    
     function blobToBase64(blob) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -374,9 +424,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const parts = base64.split(';base64,');
         if (parts.length < 2) return new Blob();
         
-        const finalMimeType = parts[0].split(':')[1]; 
+        const finalMimeType = parts[0].split(':')[1];
         
-        const byteString = atob(parts[1]); 
+        const byteString = atob(parts[1]);
         const arrayBuffer = new ArrayBuffer(byteString.length);
         const intArray = new Uint8Array(arrayBuffer);
         
@@ -394,18 +444,23 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         
         for (const card of deck.flashcards) {
+            // Apenas tenta exportar se for Blob/File (imagens locais)
             if (card.frente instanceof Blob && card.verso instanceof Blob) {
-                 const frenteBase64 = await blobToBase64(card.frente);
-                 const versoBase64 = await blobToBase64(card.verso);
-                 deckExport.flashcards.push({
-                     frente: frenteBase64,
-                     verso: versoBase64,
-                 });
+                 try {
+                    const frenteBase64 = await blobToBase64(card.frente);
+                    const versoBase64 = await blobToBase64(card.verso);
+                    deckExport.flashcards.push({
+                        frente: frenteBase64,
+                        verso: versoBase64,
+                    });
+                 } catch (e) {
+                     console.error("Erro ao converter Blob para Base64:", e);
+                 }
             }
         }
 
         if (deckExport.flashcards.length === 0) {
-            alert("Este deck não contém flashcards com imagens para exportar.");
+            alert("Este deck não contém flashcards válidos para exportar (apenas imagens/gifs são exportados).");
             return;
         }
 
@@ -439,20 +494,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 const deckImport = JSON.parse(fileText);
                 
                 if (!deckImport.name || !Array.isArray(deckImport.flashcards)) {
-                     throw new Error("Formato de deck inválido.");
+                     throw new Error("Formato de deck inválido (falta nome ou array de flashcards).");
                 }
                 
                 const novoFlashcards = [];
                 
                 for (const card of deckImport.flashcards) {
-                    if (!card.frente.startsWith('data:') || !card.verso.startsWith('data:')) {
-                         console.error("Card com Base64 corrompido, pulando.");
+                    if (!card.frente || !card.verso || !card.frente.startsWith('data:') || !card.verso.startsWith('data:')) {
+                         console.error("Card com Base64 corrompido/faltando, pulando.", card);
                          continue;
                     }
                     
                     const frenteBlob = base64ToBlob(card.frente);
                     const versoBlob = base64ToBlob(card.verso);
                     
+                    // Cria novos Files (que são Blobs)
                     novoFlashcards.push({
                         frente: new File([frenteBlob], 'frente-import', { type: frenteBlob.type }),
                         verso: new File([versoBlob], 'verso-import', { type: versoBlob.type }),
@@ -460,27 +516,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 
                 if (novoFlashcards.length === 0) {
-                     alert("O arquivo não continha flashcards válidos para importação.");
+                     alert("O arquivo não continha flashcards válidos para importação (somente cards com imagens Base64 são importados).");
                      e.target.value = '';
                      return;
                 }
 
                 const novoDeckObj = {
-                    id: Date.now(), 
+                    id: Date.now(),
                     name: deckImport.name + " (Importado)",
                     flashcards: novoFlashcards
                 };
 
                 decks.push(novoDeckObj);
-                await salvarDecks(); 
-                renderizarTodosDecks(); 
+                await salvarDecks();
+                renderizarTodosDecks();
                 alert(`Deck "${novoDeckObj.name}" importado com sucesso, com ${novoFlashcards.length} cards!`);
 
             } catch (err) {
-                alert(`Erro ao importar o arquivo: ${err.message}. Verifique se o arquivo está correto.`);
+                alert(`Erro ao importar o arquivo: ${err.message}. Verifique se o arquivo está correto e é um JSON de exportação do Sign Card.`);
                 console.error(err);
             } finally {
-                e.target.value = ''; 
+                e.target.value = '';
             }
         });
     }

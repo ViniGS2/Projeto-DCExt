@@ -38,7 +38,7 @@
                 <br><br>
                 <input type="text" name="nome-deck">
                 <br><br>
-                <button type="button" class="botao-confirmar" id="confirmar">confirmar</button>
+                <button type="button" class="botao-confirmar" id="confirmar">Confirmar</button>
             </form>
         </div>
     </div>
@@ -49,6 +49,9 @@
             <h1>Edite o seu Deck</h1>
             <form>
                 <br>
+                <label for="input-editar-nome">Nome do Deck:</label>
+                <br><br>
+                <input type="text" id="input-editar-nome"> <br><br>
                 <button type="button" class="botao-imagemGifs" id="bImagemGifs">Imagens/Gifs</button>
                 <br><br>
                 Frente:
@@ -57,16 +60,15 @@
                 <br><br>
                 Verso:
                 <br><br>
-                <input type="file" name="frente-imagem" id="verso-flashcard-img" accept="image/*,image/gif">
-                <br><br><br>
-                <button type="button" name="confirmarEditar" class="botao-confirmar" id="confirmarEditar">confirmar</button>
+                <input type="file" id="verso-flashcard-img" accept="image/*,image/gif"> <br><br><br>
+                <button type="button" name="confirmarEditar" class="botao-confirmar" id="confirmarEditar">Confirmar</button>
             </form>
         </div>
     </div>
     
     <div class="janela-estudar" id="janela-estudar">
         <div class="conteudo-estudar">
-            <button class="voltar" id="fechar-estudar">voltar</button>
+            <button class="voltar" id="fechar-estudar">Voltar</button>
             <h3>Estudando</h3>
 
             <div class="flashcard-container">
@@ -107,8 +109,8 @@
         <div class="modal-conteudo">
             <button class="fechar-modal" id="fechar-modal-signmaker">X</button>
             <h3>Criador de Sinais (SignMaker)</h3>
-            <iframe id="signmaker-iframe" 
-                    src="https://www.sutton-signwriting.io/signmaker/" 
+            <iframe id="signmaker-iframe"
+                    src="https://www.sutton-signwriting.io/signmaker/"
                     style="width: 100%; height: 60vh; border: 1px solid #000;">
             </iframe>
             <button class="botao-confirmar" id="usar-sinal-na-dropzone">Usar este Sinal</button>

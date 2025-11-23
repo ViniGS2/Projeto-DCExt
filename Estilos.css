@@ -82,7 +82,7 @@ html, body{
     width: 350px;
     height: 200px;
     background-color: orange;
-    border-radius: 15%;
+    border-radius: 5%;
     padding: 50px;
     flex-direction: column;
     justify-content: space-between;
@@ -90,9 +90,9 @@ html, body{
 
 .botao-estudar{
     border-radius: 10%;
-    width: 70%;
+    width: 56%;
     height: 30%;
-    background-color: orangered;
+    background-color: rgb(127, 38, 6); /* orangered */
     border: #00000080;
 }
 
@@ -104,19 +104,18 @@ html, body{
 
 .botao-editar {
     border-radius: 10%;
-    background-color: orangered;
+    background-color: rgb(127, 38, 6);
     border: #00000080;
     height: 27%;
 }
 
 .botao-deletar {
     border-radius: 10%;
-    background-color: orangered;
+    background-color: rgb(127, 38, 6);
     border: #00000080;
     height: 27%;
 }
 
-/* NOVO ESTILO: Botão de Exportar */
 .botao-exportar {
     border-radius: 10%;
     background-color: rgb(127, 38, 6); 
@@ -129,7 +128,6 @@ html, body{
 .botao-exportar:hover {
     transform: scale(1.1);
 }
-/* FIM NOVO ESTILO */
 
 .Deck button{
     cursor: pointer;
@@ -228,7 +226,7 @@ html, body{
 
 .conteudo-estudar{
     position: relative;
-    width: 60%; 
+    width: 80%; 
     height: auto;
     background-color: gold;
     padding: 10px;
@@ -266,8 +264,8 @@ html, body{
 /* Define a perspectiva 3D */
 .flashcard {
     background-color: transparent;
-    width: 400px; /* Largura do card */
-    height: 300px; /* Altura do card */
+    width: 560px; /* Largura do card */
+    height: 460px; /* Altura do card */
     perspective: 1000px;
     cursor: pointer;
 }
