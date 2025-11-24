@@ -43,28 +43,37 @@
         </div>
     </div>
 
-    <div class="janela-criar-flashcard" id="janela-criar-flashcard">
-        <div class="conteudo">
-            <button class="fechar" id="fechar-flashcard">X</button>
-            <h1>Edite o seu Deck</h1>
-            <form>
-                <br>
-                <label for="input-editar-nome">Nome do Deck:</label>
-                <br><br>
-                <input type="text" id="input-editar-nome"> <br><br>
-                <button type="button" class="botao-imagemGifs" id="bImagemGifs">Imagens/Gifs</button>
-                <br><br>
-                Frente:
-                <br><br>
-                <input type="file" id="frente-flashcard-img" accept="image/*,image/gif">
-                <br><br>
-                Verso:
-                <br><br>
-                <input type="file" id="verso-flashcard-img" accept="image/*,image/gif"> <br><br><br>
-                <button type="button" name="confirmarEditar" class="botao-confirmar" id="confirmarEditar">Confirmar</button>
-            </form>
-        </div>
+   <div class="janela-criar-flashcard" id="janela-criar-flashcard">
+    <div class="conteudo">
+        <button class="fechar" id="fechar-flashcard">X</button>
+        <h1>Gerenciar Deck</h1> <form>
+            <br>
+            <label for="input-editar-nome">Nome do Deck:</label>
+            <br><br>
+            <input type="text" id="input-editar-nome"> <br><br>
+            
+            <label>Adicionar Novo Card:</label>
+            <br>
+            <button type="button" class="botao-imagemGifs" id="bImagemGifs">Imagens/Gifs</button>
+            <br><br>
+            Frente:
+            <br><br>
+            <input type="file" id="frente-flashcard-img" accept="image/*,image/gif">
+            <br><br>
+            Verso:
+            <br><br>
+            <input type="file" id="verso-flashcard-img" accept="image/*,image/gif"> 
+            
+            <br><br>
+            
+            <h3>Cards Existentes (Clique para remover):</h3>
+            <div id="container-cards-existentes">
+                </div>
+            <br><br>
+            <button type="button" name="confirmarEditar" class="botao-confirmar" id="confirmarEditar">Confirmar Alterações</button>
+        </form>
     </div>
+</div>
 
     
     <div class="janela-estudar" id="janela-estudar">

@@ -356,7 +356,7 @@ html, body{
 .dropzone{
     position: relative;
     width: 100%;
-    height: 250px;
+    height: 380px;
     background-color: #ffffff; 
     border: solid orangered; 
     
@@ -407,18 +407,6 @@ html, body{
     height: 70%;
     background-color: rgb(127, 38, 6);
     border-radius: 30px;
-}
-
-
-.draggable{
-    position: absolute;
-    max-width: 150px;
-    cursor: grab;
-    user-select: none;
-    padding: 20px;
-    width: 30px;
-    height: auto;
-    border-radius: 5px;
 }
 
 .selecao-par{
@@ -500,10 +488,11 @@ html, body{
 
 .draggable{
     position: absolute;
-    width: 230px; 
-    height: 230px; 
-    max-width: 250px; 
-    max-height: 250px; 
+    width: 250px; 
+    height: 250px; 
+    max-width: 280px; 
+    max-height: 280px; 
+    padding: 50px; 
     
     cursor: grab;
     user-select: none;
@@ -517,7 +506,6 @@ html, body{
 }
 
 .draggable svg {
-
     max-width: 90%;
     max-height: 90%;
     width: auto; 
@@ -589,4 +577,43 @@ html, body{
 
 #label-importar-deck:hover {
     transform: scale(1.1);
+}
+
+/*  remover cards*/
+
+/* Estilo para a nova lista de cards dentro da janela de edição */
+#container-cards-existentes {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #333; 
+    background-color: #ffe08c;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 10px;
+}
+
+#container-cards-existentes div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    margin-bottom: 5px;
+    background-color: #ffc107; 
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    font-weight: bold;
+}
+
+#container-cards-existentes div:hover {
+    background-color: orangered; 
+    color: white;
+    transform: scale(1.01);
+}
+
+#container-cards-existentes span.remover {
+    color: darkred;
+}
+
+#container-cards-existentes div:hover span.remover {
+    color: white; 
 }

@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const frenteInput = document.getElementById('frente-flashcard-img');
     const versoInput = document.getElementById('verso-flashcard-img');
     const nomeDeckEditarInput = document.getElementById('input-editar-nome');
+    // NOVO: Elemento da lista de cards existentes
+    const containerCardsExistentes = document.getElementById('container-cards-existentes');
     
     const janelaEstudar = document.getElementById('janela-estudar');
     const flashcardEstudo = document.getElementById('flashcard-estudo');
@@ -29,6 +31,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnFecharSignMaker = document.getElementById('fechar-modal-signmaker');
     const btnUsarSinalNaDropzone = document.getElementById('usar-sinal-na-dropzone');
     const iframeSignMaker = document.getElementById('signmaker-iframe');
+
+    const janelaTemas = document.getElementById('janela-temas'); // Não usado neste código, mantido por contexto
+    const btnAbrirTemas = document.getElementById('botao-abrir-tema'); // Não usado neste código, mantido por contexto
+    const btnAplicarTemas = document.getElementById('aplicar-temas'); // Não usado neste código, mantido por contexto
+
+    const inputCorFundo = document.getElementById('input-cor-fundo'); // Não usado neste código, mantido por contexto
+    const inputCorDeck = document.getElementById('input-cor-deck'); // Não usado neste código, mantido por contexto
+    const inputCorBotao = document.getElementById('input-cor-botao'); // Não usado neste código, mantido por contexto
+
+    const rootElement = document.documentElement;     
     
     const dropzone = document.getElementById('dropzone');
 
@@ -36,6 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const inputImportar = document.getElementById('input-importar');
 
+    // ===========================================
+    // FUNÇÕES BÁSICAS
+    // ===========================================
     async function salvarDecks() {
         try {
             await localforage.setItem('signCardDecks', decks);
@@ -75,18 +90,65 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // ===========================================
+    // FUNÇÕES DA JANELA DE EDIÇÃO (NOVIDADE AQUI)
+    // ===========================================
+
+    // NOVO: Função para renderizar a lista de cards na janela de edição
+    function renderizarCardsParaEdicao(deckData) {
+        if (!containerCardsExistentes) return;
+        
+        containerCardsExistentes.innerHTML = '';
+        
+        if (deckData.flashcards.length === 0) {
+            containerCardsExistentes.innerHTML = '<p style="text-align: center; color: #666; font-style: italic;">Este deck não possui cards para remoção.</p>';
+            return;
+        }
+
+        deckData.flashcards.forEach((card, index) => {
+            const cardDiv = document.createElement('div');
+            
+            cardDiv.innerHTML = `
+                <span>Card ${index + 1}</span>
+                <span class="remover">[CLIQUE PARA REMOVER]</span>
+            `;
+            
+            // Adiciona um listener para remoção ao clicar no card
+            cardDiv.addEventListener('click', () => {
+                if (confirm(`Tem certeza que deseja remover o Card ${index + 1} do deck "${deckData.name}"?`)) {
+                    // Remove o card pelo índice
+                    deckData.flashcards.splice(index, 1);
+                    
+                    // Salva, re-renderiza a lista na janela e atualiza o contador na tela inicial
+                    salvarDecks().then(() => {
+                        renderizarCardsParaEdicao(deckData); // Re-renderiza a lista (sem fechar a janela)
+                        renderizarTodosDecks(); // Atualiza o contador de cards na tela inicial
+                    });
+                }
+            });
+            
+            containerCardsExistentes.appendChild(cardDiv);
+        });
+    }
+
     function abrirCriar(){
         janelaCriar.classList.add('abrir');
     }
     window.abrirCriar = abrirCriar;
 
+    // Abrir a janela de edição
     function AbrirEditar(deckData){
         if (deckData && nomeDeckEditarInput) {
             nomeDeckEditarInput.value = deckData.name;
+            // CHAMA A FUNÇÃO DE RENDERIZAR CARDS PARA EDIÇÃO
+            renderizarCardsParaEdicao(deckData); 
         }
         janelaEditar.classList.add('abrir');
     }
-
+    
+    // ===========================================
+    // JANELA DE ESTUDO
+    // ===========================================
     function mostrarCard(index) {
         if (!deckSendoEstudado || !deckSendoEstudado[index]) return;
 
@@ -133,6 +195,10 @@ document.addEventListener('DOMContentLoaded', () => {
         janelaEstudar.classList.add('abrir');
         mostrarCard(cardAtualIndex);
     }
+    
+    // ===========================================
+    // LISTENERS DE FECHAR JANELAS
+    // ===========================================
 
     if (janelaCriar) {
         janelaCriar.addEventListener('click', (e) => {
@@ -189,8 +255,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ===========================================
+    // LISTENER CONFIRMAR EDIÇÃO (ADICIONAR/RENOMEAR)
+    // ===========================================
     if (btnConfirmarEditar) {
-          btnConfirmarEditar.addEventListener('click', async () => {
+        btnConfirmarEditar.addEventListener('click', async () => {
 
             const frenteImagem = frenteInput?.files[0];
             const versoImagem = versoInput?.files[0];
@@ -207,11 +276,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     let deckNoDb = decks.find(d => d.id === deckId);
 
                 if (deckNoDb) {
-                        // atualiza o nomedo deck se tiver mudado
+                        // 1. Atualiza o nome do deck se tiver mudado
                         deckNoDb.name = novoNome;
-                        deckAtual.querySelector('h2').textContent = novoNome; 
 
-                        // adiciona os cards
+                        // 2. Adiciona os novos cards
                         let cardAdicionado = false;
                         if (frenteImagem && versoImagem) {
                             deckNoDb.flashcards.push({
@@ -226,18 +294,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         await salvarDecks();
 
-                        // atualiza o contadorr
-                        if (cardAdicionado) {
-                            const contador = deckAtual.querySelector('p');
-                            const count = deckNoDb.flashcards.length;
-                            contador.textContent = `${count} card${count > 1 ? 's' : ''}`;
-                        }
+                        // 3. Atualiza a interface
+                        renderizarTodosDecks(); // Atualiza o nome e contador na tela inicial
                         
                         // limpa a janela e fecha
                         if (cardAdicionado) {
                             frenteInput.value = "";
                             versoInput.value = "";
                         }
+                        // NOTA: A remoção de cards foi tratada na função renderizarCardsParaEdicao 
+                        // e salva automaticamente, então apenas fechamos a janela aqui.
+
                         janelaEditar.classList.remove('abrir');
                     }
                 } catch (err) {
@@ -249,6 +316,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // ===========================================
+    // LISTENERS DE DECKS (ESTUDAR/EDITAR/DELETAR)
+    // ===========================================
 
     if (container) {
         container.addEventListener('click', async (e) => {
@@ -266,6 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (e.target.classList.contains('botao-editar')) {
                 deckAtual = deckElemento;
+                // Abre e carrega a lista de cards
                 AbrirEditar(deckData);
             }
             if (e.target.classList.contains('botao-estudar')) {
@@ -281,6 +353,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // ===========================================
+    // LISTENER CONFIRMAR CRIAÇÃO
+    // ===========================================
 
     if (btnConfirmar) {
         btnConfirmar.addEventListener('click', async () => {
@@ -302,20 +378,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ===========================================
+    // FUNÇÕES DE ARRASTO (SIGN MAKER)
+    // ===========================================
+
     function ativarArrasto(img) {
+    // Certifique-se de que o CSS para .draggable já tem 'position: absolute;'
+    
     img.addEventListener('mousedown', (e) => {
         e.preventDefault();
+        
+        // Coordenadas do clique dentro do elemento (deslocamento)
         const shiftX = e.clientX - img.getBoundingClientRect().left;
         const shiftY = e.clientY - img.getBoundingClientRect().top;
 
         img.style.zIndex = 1000;
 
-        function mover(pageX, pageY) {
-            // As coordenadas são relativas à dropzone
-            let newLeft = pageX - shiftX - dropzone.getBoundingClientRect().left;
-            let newTop = pageY - shiftY - dropzone.getBoundingClientRect().top;
+        function mover(clientX, clientY) {
+            const dropzoneRect = dropzone.getBoundingClientRect();
             
-            // Garante que não ultrapasse os limites da dropzone
+            // Calcula a nova posição relativa à dropzone, usando clientX/Y 
+            // menos o deslocamento do clique (shift) e a posição da dropzone
+            let newLeft = clientX - shiftX - dropzoneRect.left;
+            let newTop = clientY - shiftY - dropzoneRect.top;
+            
+            // Aplica os limites da dropzone
             newLeft = Math.max(0, Math.min(newLeft, dropzone.clientWidth - img.clientWidth));
             newTop = Math.max(0, Math.min(newTop, dropzone.clientHeight - img.clientHeight));
 
@@ -324,7 +411,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function aoMover(e) {
-            mover(e.pageX, e.pageY);
+            // Chama mover com clientX e clientY
+            mover(e.clientX, e.clientY);
         }
 
         function aoSoltar() {
@@ -343,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     img.ondragstart = () => false;
-}
+    }
 
 
     window.addEventListener('message', (event) => {
@@ -409,7 +497,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // parte de importação
+    // ===========================================
+    // FUNÇÕES DE EXPORTAÇÃO E IMPORTAÇÃO
+    // ===========================================
     
     function blobToBase64(blob) {
         return new Promise((resolve, reject) => {
@@ -454,7 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         verso: versoBase64,
                     });
                  } catch (e) {
-                     console.error("Erro ao converter Blob para Base64:", e);
+                    console.error("Erro ao converter Blob para Base64:", e);
                  }
             }
         }
@@ -494,7 +584,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const deckImport = JSON.parse(fileText);
                 
                 if (!deckImport.name || !Array.isArray(deckImport.flashcards)) {
-                     throw new Error("Formato de deck inválido (falta nome ou array de flashcards).");
+                    throw new Error("Formato de deck inválido (falta nome ou array de flashcards).");
                 }
                 
                 const novoFlashcards = [];
@@ -516,7 +606,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 
                 if (novoFlashcards.length === 0) {
-                     alert("O arquivo não continha flashcards válidos para importação (somente cards com imagens Base64 são importados).");
+                    alert("O arquivo não continha flashcards válidos para importação (somente cards com imagens Base64 são importados).");
                      e.target.value = '';
                      return;
                 }
@@ -541,7 +631,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // ==========================================================
 
     carregarDecks();
 });
