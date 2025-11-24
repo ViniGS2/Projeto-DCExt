@@ -60,8 +60,8 @@ html, body{
 }
 
 #botao-criar {
-    border-radius: 10%;
-    width: 200px;
+    border-radius: 5%;
+    width: 180px;
     height: 50px;
     border: #00000080;
     color: rgb(0, 0, 0);
@@ -120,7 +120,7 @@ html, body{
 
 .botao-exportar {
     border-radius: 10%;
-    background-color: orangered; 
+    background-color: rgb(130, 2, 2); 
     color: white;
     border: #00000080;
     height: 27%;
@@ -136,7 +136,7 @@ html, body{
 }
 
 .Deck button:hover{
-    transform: scale(1.1);
+    transform: scale(1.1); 
 }
 
 #container-decks {
@@ -267,8 +267,8 @@ html, body{
 /* Define a perspectiva 3D */
 .flashcard {
     background-color: transparent;
-    width: 560px; /* Largura do card */
-    height: 460px; /* Altura do card */
+    width: 730px; /* Largura do card */
+    height: 430px; /* Altura do card */
     perspective: 1000px;
     cursor: pointer;
 }
@@ -279,7 +279,7 @@ html, body{
     width: 100%;
     height: 100%;
     transition: transform 0.6s;
-    transform-style: preserve-3d; /* Mantém o 3D */
+    transform-style: preserve-3d; /* 3D */
 }
 
 /* Classe 'is-flipped' que será adicionada/removida pelo JS */
@@ -293,7 +293,7 @@ html, body{
     position: absolute;
     width: 100%;
     height: 100%;
-    -webkit-backface-visibility: hidden; /* Safari */
+    -webkit-backface-visibility: hidden; 
     backface-visibility: hidden; /* Esconde o lado de trás */
     border-radius: 15px;
     background-color: white;
@@ -332,7 +332,6 @@ html, body{
     border-radius: 10%;
     width: 100px;
     height: 36px;
-    background-color: orangered;
     border: solid transparent;
     cursor: pointer;
     font-weight: bold;
@@ -341,6 +340,44 @@ html, body{
 
 .navegacao-estudo button:hover {
     transform: scale(1.1);
+}
+
+
+#card-correto {
+    background-color: green; 
+}
+
+#card-incorreto {
+    background-color: red; 
+}
+
+/* Barra de progresso */
+.barra-progresso-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+    gap: 10px;
+}
+
+.barra-progresso {
+    width: 300px;
+    height: 20px;
+    background-color: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.barra-progresso-preenchimento {
+    height: 100%;
+    background-color: #4CAF50;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+#texto-progresso {
+    font-weight: bold;
+    color: #333;
 }
 
 /*area de criar sinais*/
@@ -558,10 +595,10 @@ html, body{
     align-items: center;
     text-align: center;
     
-    width: 200px;
+    width: 180px;
     height: 50px;
     
-    border-radius: 10%;
+    border-radius: 5%;
     
     background-color: orangered; 
     color: rgb(0, 0, 0);
@@ -581,7 +618,6 @@ html, body{
 
 /*  remover cards*/
 
-/* Estilo para a nova lista de cards dentro da janela de edição */
 #container-cards-existentes {
     max-height: 200px;
     overflow-y: auto;
@@ -616,4 +652,77 @@ html, body{
 
 #container-cards-existentes div:hover span.remover {
     color: white; 
+}
+
+.janela-resultados {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #00000080;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+#fechar-resultados {
+    border-radius: 10px;
+    width: 200px;
+    height: 50px;
+    background-color: orangered; 
+    color: white;
+    border: solid transparent;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+}
+
+#fechar-resultados:hover {
+    transform: scale(1.05);
+    background-color: orange; 
+}
+
+.janela-resultados.abrir {
+    display: flex;
+}
+
+.conteudo-resultados {
+    position: relative;
+    width: 50%;
+    min-width: 300px;
+    min-height: 400px;
+    background-color: gold;
+    padding: 50px;
+    border-radius: 20px;
+    text-align: center;
+}
+
+.estatisticas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin: 30px 0;
+}
+
+.estatistica-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+}
+
+.estatistica-valor {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: orangered;
+}
+
+.estatistica-label {
+    margin-top: 10px;
+    font-size: 1em;
+    color: #555;
 }

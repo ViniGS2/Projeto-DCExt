@@ -54,23 +54,23 @@
             
             <label>Adicionar Novo Card:</label>
             <br>
-            <button type="button" class="botao-imagemGifs" id="bImagemGifs">Imagens/Gifs</button>
-            <br><br>
-            Frente:
+        
+            <br>    
+            Frente:(Imagens/Gifs)
             <br><br>
             <input type="file" id="frente-flashcard-img" accept="image/*,image/gif">
             <br><br>
-            Verso:
+            Verso: (Imagens/Gifs)
             <br><br>
             <input type="file" id="verso-flashcard-img" accept="image/*,image/gif"> 
             
             <br><br>
             
-            <h3>Cards Existentes (Clique para remover):</h3>
+            <h3>Cards Existentes:</h3>
             <div id="container-cards-existentes">
                 </div>
             <br><br>
-            <button type="button" name="confirmarEditar" class="botao-confirmar" id="confirmarEditar">Confirmar Alterações</button>
+            <button type="button" name="confirmarEditar" class="botao-confirmar" id="confirmarEditar">Confirmar</button>
         </form>
     </div>
 </div>
@@ -93,9 +93,17 @@
             </div>
 
             <div class="navegacao-estudo">
-                <button id="card-anterior">Anterior</button>
+                <button id="card-incorreto">Incorreto</button>
                 <span id="contador-cards">0 / 0</span>
-                <button id="card-proximo">Próximo</button>
+                <button id="card-correto">Correto</button>
+                
+            </div>
+            
+            <div class="barra-progresso-container">
+                <div class="barra-progresso">
+                    <div class="barra-progresso-preenchimento" id="barra-progresso-preenchimento"></div>
+                </div>
+                <span id="texto-progresso">0%</span>
             </div>
             
             <div class="container-montar">
@@ -111,6 +119,30 @@
         
         </div>
 
+    <div class="janela-resultados" id="janela-resultados">
+        <div class="conteudo-resultados">
+            <h1>Resultados do Estudo</h1>
+            <div class="estatisticas">
+                <div class="estatistica-item">
+                    <span class="estatistica-valor" id="total-cards">0</span>
+                    <span class="estatistica-label">Total de Cards</span>
+                </div>
+                <div class="estatistica-item">
+                    <span class="estatistica-valor" id="corretos-count">0</span>
+                    <span class="estatistica-label">Corretos</span>
+                </div>
+                <div class="estatistica-item">
+                    <span class="estatistica-valor" id="incorretos-count">0</span>
+                    <span class="estatistica-label">Incorretos</span>
+                </div>
+                <div class="estatistica-item">
+                    <span class="estatistica-valor" id="percentual-acerto">0%</span>
+                    <span class="estatistica-label">Percentual de Acerto</span>
+                </div>
+            </div>
+            <button class="botao-confirmar" id="fechar-resultados">Voltar aos Decks</button>
+        </div>
+    </div>
     
     <div id="container-decks">
     </div>
@@ -126,6 +158,8 @@
             <button class="botao-confirmar" id="usar-sinal-na-dropzone">Usar este Sinal</button>
         </div>
     </div>
+    
+    
     
     <script src="script.js"></script>
 </body>
