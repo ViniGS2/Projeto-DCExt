@@ -1,15 +1,22 @@
-
-
 #CabecalhoInic{
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; 
     align-items: center;
+    width: 100%; 
+    margin-bottom: 20px; 
 }
 
 body{
+    overflow-y: auto;
     background-color: gold;
     margin-left: 10%;
     margin-right: 10%;
+    overflow-x: hidden;
+
+}
+
+html, body{
+    height: 100%;
 }
 
 
@@ -30,7 +37,7 @@ body{
     position: relative;
     width: 40%;
     min-width: 100px;
-    min-height: 100px;
+    min-height: 300px;
     background-color: gold;
     padding: 50px;
     border-radius: 20px;
@@ -44,7 +51,7 @@ body{
     height: 30px;
     border-radius: 50%;
     border: #00000080;
-    background-color: red;
+    background-color: orangered;
     cursor: pointer;
 }
 
@@ -53,12 +60,14 @@ body{
 }
 
 #botao-criar {
-    border-radius: 10%;
-    width: 200px;
+    border-radius: 5%;
+    width: 180px;
     height: 50px;
     border: #00000080;
+    color: rgb(0, 0, 0);
     background-color: orangered;
     cursor: pointer;
+    font-weight: bold;
 }
 
 .pag-criar-elems {
@@ -72,10 +81,10 @@ body{
 }
 
 .Deck{
-    width: 250px;
-    height: 100px;
+    width: 350px;
+    height: 200px;
     background-color: orange;
-    border-radius: 30%;
+    border-radius: 5%;
     padding: 50px;
     flex-direction: column;
     justify-content: space-between;
@@ -83,15 +92,15 @@ body{
 
 .botao-estudar{
     border-radius: 10%;
-    width: 70%;
+    width: 56%;
     height: 30%;
-    background-color: orangered;
+    background-color: orangered; /* orangered */
     border: #00000080;
 }
 
 .Deck p{
-    border-radius: 20%;
-    background-color: rgba(213, 139, 0, 0.915);
+    border-radius: 15%;
+    background-color: orange;
     width: 25%;
 }
 
@@ -109,27 +118,40 @@ body{
     height: 27%;
 }
 
+.botao-exportar {
+    border-radius: 10%;
+    background-color: rgb(130, 2, 2); 
+    color: white;
+    border: #00000080;
+    height: 27%;
+    cursor: pointer;
+}
+
+.botao-exportar:hover {
+    transform: scale(1.1);
+}
+
 .Deck button{
     cursor: pointer;
 }
 
 .Deck button:hover{
-    transform: scale(1.1);
+    transform: scale(1.1); 
 }
 
 #container-decks {
-    display: flex;           /* em linhas*/
-    flex-wrap: wrap;         /* quebra linha*/ 
-    gap: 64px;               
-    margin-top: 20px;        
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 64px; 
+    margin-top: 20px; 
 }
 
 .conteudo input{
     border-radius: 10px;
     border: 10px solid transparent;
     width: 60%;
-    height: 30px;
-    background-color: rgba(213, 139, 0, 0.915);
+    height: 40px;
+    background-color: orange;
 }
 
 .conteudo .botao-confirmar{
@@ -137,10 +159,570 @@ body{
     width: 15%;
     height: 36px;
     background-color: orangered;
-    border: transparent;
+    border: solid transparent;
     cursor: pointer;
 }
 
-#confirmar:hover{
+.conteudo .botao-texto{
+    border-radius: 10%;
+    width: 15%;
+    height: 36px;
+    background-color: orangered;
+    border: solid transparent;
+    cursor: pointer;
+}
+
+#bTexto:hover{
     transform: scale(1.1);
+}
+
+.conteudo .botao-imagemGifs{
+    border-radius: 10%;
+    width: 20%;
+    height: 36px;
+    background-color: orangered;
+    border: solid transparent;
+    cursor: pointer;
+}
+
+#bImagemGifs:hover{
+    transform: scale(1.1);
+}
+
+
+.janela-criar-flashcard{
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #00000080;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    
+}
+
+.janela-criar-flashcard.abrir{
+    display : flex
+}
+
+/* --- Estilos da Janela de Estudo --- */
+
+.janela-estudar {
+    width: 100vw;
+    max-height: 200vh;
+    min-height: 100vh;
+    position: absolute;
+    text-align: center;
+    top: 0;
+    left: 0;
+    
+    background-color: gold; 
+    
+    display: none;
+    align-items: center;
+    justify-content: center;
+    
+}
+
+.conteudo-estudar{
+    position: relative;
+    width: 80%; 
+    height: auto;
+    background-color: gold;
+    padding: 10px;
+    border-radius: 20px;
+}
+
+.janela-estudar.abrir {
+    display: flex;
+}
+
+.voltar{
+    width: 100px;
+    height: 30px;
+    background-color: orangered;
+    position: absolute;
+    top: 20px; 
+    right: 50px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    border: transparent;
+    border-radius: 10px;
+}
+
+
+/* --- Estilos do Efeito de Virar (Flashcard) --- */
+
+.flashcard-container {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Define a perspectiva 3D */
+.flashcard {
+    background-color: transparent;
+    width: 730px; /* Largura do card */
+    height: 430px; /* Altura do card */
+    perspective: 1000px;
+    cursor: pointer;
+}
+
+/* O container que realmente vira */
+.flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d; /* 3D */
+}
+
+/* Classe 'is-flipped' que será adicionada/removida pelo JS */
+.flashcard.is-flipped .flashcard-inner {
+    transform: rotateY(180deg);
+}
+
+/* Frente e Verso */
+.flashcard-front,
+.flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden; 
+    backface-visibility: hidden; /* Esconde o lado de trás */
+    border-radius: 15px;
+    background-color: white;
+    border: 2px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Garante que a imagem não vaze */
+}
+
+/* O verso começa virado */
+.flashcard-back {
+    transform: rotateY(180deg);
+    background-color: #f0f0f0;
+}
+
+/* Estilo para as imagens dentro dos cards */
+.flashcard-front img,
+.flashcard-back img {
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: contain;
+}
+
+/* --- Estilos da Navegação --- */
+
+.navegacao-estudo {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.navegacao-estudo button {
+    border-radius: 10%;
+    width: 100px;
+    height: 36px;
+    border: solid transparent;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+}
+
+.navegacao-estudo button:hover {
+    transform: scale(1.1);
+}
+
+
+#card-correto {
+    background-color: green; 
+}
+
+#card-incorreto {
+    background-color: red; 
+}
+
+/* Barra de progresso */
+.barra-progresso-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+    gap: 10px;
+}
+
+.barra-progresso {
+    width: 300px;
+    height: 20px;
+    background-color: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.barra-progresso-preenchimento {
+    height: 100%;
+    background-color: #4CAF50;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+#texto-progresso {
+    font-weight: bold;
+    color: #333;
+}
+
+/*area de criar sinais*/
+
+.container-montar{
+    display: flex;
+    text-align: center;
+    flex-direction: column;
+    margin-bottom: 20px;
+    padding-top: 20px;
+}
+
+.dropzone{
+    position: relative;
+    width: 100%;
+    height: 380px;
+    background-color: #ffffff; 
+    border: solid orangered; 
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.Biblioteca{
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 300px;
+    height: 7vh;
+    background-color: orangered;
+    padding: 10px;
+    gap: 10px;
+    z-index: 9999;
+    border-radius: 30px;
+    cursor: pointer;
+}
+
+.Biblioteca.open{
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 300px;
+    height: 76vh;
+    background-color: orangered;
+    padding: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 9999;
+    border-radius: 30px;
+}
+
+.sighWritting-images{
+    display: none;
+}
+
+.Biblioteca.open .sighWritting-images{
+    display: flex;
+    height: 70%;
+    background-color: rgb(127, 38, 6);
+    border-radius: 30px;
+}
+
+.selecao-par{
+    display: none;
+}
+
+.Biblioteca.open .selecao-par{
+    width: 100px;
+    height: 50px;
+    display: flex;
+}
+
+.selecao-par select{
+    width: 100px;
+    height: 30px;
+    padding: 5px;
+    border-radius: 20px;
+}
+
+/* SignMaker */
+
+.modal-signmaker {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #00000080;
+    display: none; 
+    align-items: center;
+    justify-content: center;
+    z-index: 10000; 
+}
+
+.modal-signmaker.abrir {
+    display: flex; /* mostra o modal */
+}
+
+.modal-signmaker .modal-conteudo {
+    position: relative;
+    width: 80%;
+    max-width: 800px;
+    background-color: gold;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.modal-signmaker .fechar-modal {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background-color: orangered;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    z-index: 10;
+}
+
+
+.botao-signwriting {
+    border-radius: 10px;
+    width: 100%;
+    height: 40px;
+    background-color: orangered; 
+    color: white;
+    border: solid transparent;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+}
+.botao-signwriting:hover {
+    transform: scale(1.02);
+}
+
+.draggable{
+    position: absolute;
+    width: 250px; 
+    height: 250px; 
+    max-width: 280px; 
+    max-height: 280px; 
+    padding: 50px; 
+    
+    cursor: grab;
+    user-select: none;
+    border-radius: 5px;
+    border: 1px solid rgba(0,0,0,0.2); 
+    box-sizing: border-box; 
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    overflow: hidden; 
+}
+
+.draggable svg {
+    max-width: 90%;
+    max-height: 90%;
+    width: auto; 
+    height: auto; 
+    display: block;
+}
+
+/*importar botçao*/
+
+
+#input-importar {
+    display: none;
+}
+
+
+#label-importar-deck.botao-importar {
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    
+    width: 200px;
+    height: 50px;
+    
+    border-radius: 10%;
+    
+    background-color: orangered; 
+    color: white;
+    border: #00000080;
+    
+    cursor: pointer;
+    font-weight: bold;
+    user-select: none; 
+}
+
+#label-importar-deck.botao-importar:hover {
+    transform: scale(1.1);
+}
+
+
+#input-importar {
+    display: none !important;
+}
+
+#label-importar-deck {
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    
+    width: 180px;
+    height: 50px;
+    
+    border-radius: 5%;
+    
+    background-color: orangered; 
+    color: rgb(0, 0, 0);
+    border: #00000000;
+    
+    cursor: pointer;
+    font-weight: bold;
+    user-select: none;
+    
+    line-height: 1; 
+    padding: 0 10px;
+}
+
+#label-importar-deck:hover {
+    transform: scale(1.1);
+}
+
+/*  remover cards*/
+
+#container-cards-existentes {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #333; 
+    background-color: #ffe08c;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 10px;
+}
+
+#container-cards-existentes div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    margin-bottom: 5px;
+    background-color: #ffc107; 
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    font-weight: bold;
+}
+
+#container-cards-existentes div:hover {
+    background-color: orangered; 
+    color: white;
+    transform: scale(1.01);
+}
+
+#container-cards-existentes span.remover {
+    color: darkred;
+}
+
+#container-cards-existentes div:hover span.remover {
+    color: white; 
+}
+
+.janela-resultados {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #00000080;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+#fechar-resultados {
+    border-radius: 10px;
+    width: 200px;
+    height: 50px;
+    background-color: orangered; 
+    color: white;
+    border: solid transparent;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+}
+
+#fechar-resultados:hover {
+    transform: scale(1.05);
+    background-color: orange; 
+}
+
+.janela-resultados.abrir {
+    display: flex;
+}
+
+.conteudo-resultados {
+    position: relative;
+    width: 50%;
+    min-width: 300px;
+    min-height: 400px;
+    background-color: gold;
+    padding: 50px;
+    border-radius: 20px;
+    text-align: center;
+}
+
+.estatisticas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin: 30px 0;
+}
+
+.estatistica-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+}
+
+.estatistica-valor {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: orangered;
+}
+
+.estatistica-label {
+    margin-top: 10px;
+    font-size: 1em;
+    color: #555;
 }
